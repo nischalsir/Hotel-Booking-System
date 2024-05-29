@@ -1,0 +1,41 @@
+HotelBookingSystem/
+│
+├── public/                # Publicly accessible files
+│   ├── css/               # Stylesheets
+│   ├── js/                # JavaScript files
+│   ├── images/            # Images
+│   ├── index.html         # Homepage
+│   ├── login.html         # Login page
+│   ├── register.html      # Registration page
+│   ├── reset_password.html# Reset password page
+│   └── booking.html       # Booking page
+│
+├── includes/              # PHP includes (e.g., header, footer)
+│   ├── header.php
+│   └── footer.php
+│
+├── config/                # Configuration files
+│   └── config.php         # Database configuration
+│
+├── admin/                 # Admin panel
+│   ├── index.php          # Admin dashboard
+│   ├── manage_rooms.php   # Manage rooms
+│   ├── manage_bookings.php# Manage bookings
+│   └── manage_users.php   # Manage users
+│
+├── src/                   # Source files (e.g., classes, functions)
+│   ├── User.php
+│   ├── Room.php
+│   ├── Booking.php
+│   └── Auth.php
+│
+├── database/              # Database-related files
+│   └── init.sql           # SQL script to initialize the database
+│
+├── actions/               # PHP scripts for form actions
+│   ├── register.php
+│   ├── login.php
+│   ├── reset_password.php
+│   └── handle_reset.php
+└── email/                 # Email templates and scripts
+    └── send_reset_email.php
