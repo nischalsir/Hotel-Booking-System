@@ -29,7 +29,7 @@ if(isset($_POST['signup'])){
         if($data_check){
             $subject = "Email Verification Code";
             $message = "Your verification code is $code";
-            $sender = "From: shahiprem7890@gmail.com";
+            $sender = "From: nischalpandey2002@gmail.com";
             if(mail($email, $subject, $message, $sender)){
                 $info = "We've sent a verification code to your email - $email";
                 $_SESSION['info'] = $info;
@@ -63,7 +63,7 @@ if(isset($_POST['signup'])){
             if($update_res){
                 $_SESSION['name'] = $name;
                 $_SESSION['email'] = $email;
-                header('location: home.php');
+                header('location: index.html');
                 exit();
             }else{
                 $errors['otp-error'] = "Failed while updating code!";
@@ -114,7 +114,7 @@ if(isset($_POST['signup'])){
             if($run_query){
                 $subject = "Password Reset Code";
                 $message = "Your password reset code is $code";
-                $sender = "From: shahiprem7890@gmail.com";
+                $sender = "From: nischalpandey2002@gmail.com";
                 if(mail($email, $subject, $message, $sender)){
                     $info = "We've sent a passwrod reset otp to your email - $email";
                     $_SESSION['info'] = $info;
