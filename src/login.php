@@ -33,7 +33,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             $_SESSION["id"] = $id;
                             $_SESSION["name"] = $name;
                             $_SESSION["email"] = $email;
-                            header("location: index.php");
+                            header("location: ../public/index.html");
                         } else{
                             $login_err = "Invalid email or password.";
                         }
@@ -50,28 +50,3 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     mysqli_close($link);
 }
 ?>
-
-<link rel="stylesheet" href="css/styles.css">
-<?php 
-if(!empty($login_err)){
-    echo '<div>' . $login_err . '</div>';
-}        
-?>
-<div class="container">
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="form">
-    <header>Login</header>
-    <p>Please fill in your credentials to login.</p>
-        <div class="input-box">
-            <label>Email</label>
-            <input type="text" name="email" value="<?php echo $email; ?>">
-            <span><?php echo $email_err; ?></span>
-        </div>
-        <div class="input-box">
-            <label>Password</label>
-            <input type="password" name="password">
-            <span><?php echo $password_err; ?></span>
-        </div>
-        <button type="submit">Login</button>
-        <p>Don't have an account? <a href="register.php">Sign up now</a>.</p>
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-</div>

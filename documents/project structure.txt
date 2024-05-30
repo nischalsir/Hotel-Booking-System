@@ -1,3 +1,27 @@
+Great! Let's start building the Hotel Booking System in Visual Studio Code (VS Code). I'll guide you through the initial setup and the first few steps of the project. 
+
+### Step 1: Setting Up Your Project
+
+1. **Install VS Code**: Make sure you have Visual Studio Code installed. You can download it from [here](https://code.visualstudio.com/).
+
+2. **Install XAMPP**: To run PHP and MySQL, you can use XAMPP. Download and install it from [here](https://www.apachefriends.org/index.html).
+
+3. **Create a Project Directory**: Create a new directory for your project. You can do this using the terminal or file explorer. For example:
+   ```
+   mkdir HotelBookingSystem
+   cd HotelBookingSystem
+   ```
+
+4. **Open the Project in VS Code**:
+   ```
+   code .
+   ```
+
+### Step 2: Setting Up the Project Structure
+
+Inside your project directory, set up the following basic structure:
+
+```
 HotelBookingSystem/
 │
 ├── public/                # Publicly accessible files
@@ -7,8 +31,8 @@ HotelBookingSystem/
 │   ├── index.html         # Homepage
 │   ├── login.html         # Login page
 │   ├── register.html      # Registration page
+│   ├── booking.html       # Booking page
 │   ├── reset_password.html# Reset password page
-│   └── booking.html       # Booking page
 │
 ├── includes/              # PHP includes (e.g., header, footer)
 │   ├── header.php
@@ -27,15 +51,335 @@ HotelBookingSystem/
 │   ├── User.php
 │   ├── Room.php
 │   ├── Booking.php
-│   └── Auth.php
+│   ├── Auth.php
+│   ├── register.php       # Registration script
+│   ├── login.php          # Login script
+│   ├── reset_password.php # Password reset script
+│   └── send_email.php     # Email sending script
 │
-├── database/              # Database-related files
-│   └── init.sql           # SQL script to initialize the database
-│
-├── actions/               # PHP scripts for form actions
-│   ├── register.php
-│   ├── login.php
-│   ├── reset_password.php
-│   └── handle_reset.php
-└── email/                 # Email templates and scripts
-    └── send_reset_email.php
+└── database/              # Database-related files
+    └── init.sql           # SQL script to initialize the database
+```
+
+### Step 3: Setting Up the Database
+
+1. **Start XAMPP**: Launch XAMPP and start Apache and MySQL.
+
+2. **Create the Database**:
+   - Open `phpMyAdmin` (usually at `http://localhost/phpmyadmin`).
+   - Create a new database called `hotel_booking`.
+
+3. **Initialize the Database**:
+   - Create a file `init.sql` inside the `database/` directory with the following content to set up the initial database schema:
+   ```sql
+   CREATE DATABASE IF NOT EXISTS hotel_booking;
+   USE hotel_booking;
+
+   CREATE TABLE users (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       name VARCHAR(100) NOT NULL,
+       email VARCHAR(100) NOT NULL UNIQUE,
+       password VARCHAR(255) NOT NULL,
+       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   );
+
+   CREATE TABLE rooms (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       room_type VARCHAR(50) NOT NULL,
+       description TEXT NOT NULL,
+       price DECIMAL(10, 2) NOT NULL,
+       availability BOOLEAN DEFAULT TRUE
+   );
+
+   CREATE TABLE bookings (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       user_id INT NOT NULL,
+       room_id INT NOT NULL,
+       booking_date DATE NOT NULL,
+       status VARCHAR(50) NOT NULL,
+       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+       FOREIGN KEY (user_id) REFERENCES users(id),
+       FOREIGN KEY (room_id) REFERENCES rooms(id)
+   );
+   ```
+
+4. **Run the SQL Script**:
+   - Open `phpMyAdmin` and select the `hotel_booking` database.
+   - Go to the SQL tab and paste the contents of `init.sql` to run the script.
+
+### Step 4: Setting Up Configuration
+
+1. **Create the Configuration File**:
+   - In the `config/` directory, create a file named `config.php`:
+   ```php
+   <?php
+   define('DB_SERVER', 'localhost');
+   define('DB_USERNAME', 'root');
+   define('DB_PASSWORD', '');
+   define('DB_NAME', 'hotel_booking');
+
+   /* Attempt to connect to MySQL database */
+   $link = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+
+   // Check connection
+   if($link === false){
+       die("ERROR: Could not connect. " . mysqli_connect_error());
+   }
+   ?>
+   ```
+
+### Step 5: Setting Up Basic Pages
+
+1. **Create the Header and Footer**:
+   - In the `includes/` directory, create `header.php` and `footer.php`:
+   ```php
+   <!-- header.php -->
+   <!DOCTYPE html>
+   <html lang="en">
+   <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>Hotel Booking System</title>
+       <link rel="stylesheet" href="css/style.css">
+   </head>
+   <body>
+   <header>
+       <h1>Hotel Booking System</h1>
+       <nav>
+           <ul>
+               <li><a href="index.php">Home</a></li>
+               <li><a href="login.php">Login</a></li>
+               <li><a href="register.php">Register</a></li>
+           </ul>
+       </nav>
+   </header>
+   <main>
+   ```
+
+   ```php
+   <!-- footer.php -->
+   </main>
+   <footer>
+       <p>&copy; 2024 Hotel Booking System</p>
+   </footer>
+   </body>
+   </html>
+   ```
+
+2. **Create the Homepage**:
+   - In the `public/` directory, create `index.php`:
+   ```php
+   <?php include('../includes/header.php'); ?>
+   <h2>Welcome to Our Hotel</h2>
+   <p>Enjoy your stay at our wonderful hotel!</p>
+   <?php include('../includes/footer.php'); ?>
+   ```
+
+### Step 6: Setting Up User Registration and Login
+
+1. **Create Registration Page**:
+   - In the `public/` directory, create `register.php`:
+   ```php
+   <?php
+   require_once "../config/config.php";
+
+   $name = $email = $password = $confirm_password = "";
+   $name_err = $email_err = $password_err = $confirm_password_err = "";
+
+   if($_SERVER["REQUEST_METHOD"] == "POST"){
+       // Validate name
+       if(empty(trim($_POST["name"]))){
+           $name_err = "Please enter your name.";
+       } else{
+           $name = trim($_POST["name"]);
+       }
+
+       // Validate email
+       if(empty(trim($_POST["email"]))){
+           $email_err = "Please enter your email.";
+       } else{
+           $sql = "SELECT id FROM users WHERE email = ?";
+           if($stmt = mysqli_prepare($link, $sql)){
+               mysqli_stmt_bind_param($stmt, "s", $param_email);
+               $param_email = trim($_POST["email"]);
+               if(mysqli_stmt_execute($stmt)){
+                   mysqli_stmt_store_result($stmt);
+                   if(mysqli_stmt_num_rows($stmt) == 1){
+                       $email_err = "This email is already taken.";
+                   } else{
+                       $email = trim($_POST["email"]);
+                   }
+               } else{
+                   echo "Oops! Something went wrong. Please try again later.";
+               }
+               mysqli_stmt_close($stmt);
+           }
+       }
+
+       // Validate password
+       if(empty(trim($_POST["password"]))){
+           $password_err = "Please enter a password.";
+       } elseif(strlen(trim($_POST["password"])) < 6){
+           $password_err = "Password must have at least 6 characters.";
+       } else{
+           $password = trim($_POST["password"]);
+       }
+
+       // Validate confirm password
+       if(empty(trim($_POST["confirm_password"]))){
+           $confirm_password_err = "Please confirm your password.";
+       } else{
+           $confirm_password = trim($_POST["confirm_password"]);
+           if(empty($password_err) && ($password != $confirm_password)){
+               $confirm_password_err = "Password did not match.";
+           }
+       }
+
+       if(empty($name_err) && empty($email_err) && empty($password_err) && empty($confirm_password_err)){
+           $sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+           if($stmt = mysqli_prepare($link, $sql)){
+               mysqli_stmt_bind_param($stmt, "sss", $param_name, $param_email, $param_password);
+               $param_name = $name;
+               $param_email = $email;
+               $param_password = password_hash($password, PASSWORD_DEFAULT);
+               if(mysqli_stmt_execute($stmt)){
+                   header("location: login.php");
+               } else{
+                   echo "Something went wrong. Please try again later.";
+               }
+               mysqli_stmt_close($stmt);
+           }
+       }
+       mysqli_close($link);
+   }
+   ?>
+
+   <?php include('../includes/header.php'); ?>
+   <h2>Register</h2>
+   <p>Please fill this form to create an account.</p>
+   <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+       <div>
+           <label>Name</label>
+           <input type="text" name="name" value="<?php echo $name
+
+; ?>">
+           <span><?php echo $name_err; ?></span>
+       </div>
+       <div>
+           <label>Email</label>
+           <input type="text" name="email" value="<?php echo $email; ?>">
+           <span><?php echo $email_err; ?></span>
+       </div>
+       <div>
+           <label>Password</label>
+           <input type="password" name="password" value="<?php echo $password; ?>">
+           <span><?php echo $password_err; ?></span>
+       </div>
+       <div>
+           <label>Confirm Password</label>
+           <input type="password" name="confirm_password" value="<?php echo $confirm_password; ?>">
+           <span><?php echo $confirm_password_err; ?></span>
+       </div>
+       <div>
+           <input type="submit" value="Submit">
+           <input type="reset" value="Reset">
+       </div>
+       <p>Already have an account? <a href="login.php">Login here</a>.</p>
+   </form>
+   <?php include('../includes/footer.php'); ?>
+   ```
+
+2. **Create Login Page**:
+   - In the `public/` directory, create `login.php`:
+   ```php
+   <?php
+   require_once "../config/config.php";
+
+   $email = $password = "";
+   $email_err = $password_err = $login_err = "";
+
+   if($_SERVER["REQUEST_METHOD"] == "POST"){
+       if(empty(trim($_POST["email"]))){
+           $email_err = "Please enter your email.";
+       } else{
+           $email = trim($_POST["email"]);
+       }
+
+       if(empty(trim($_POST["password"]))){
+           $password_err = "Please enter your password.";
+       } else{
+           $password = trim($_POST["password"]);
+       }
+
+       if(empty($email_err) && empty($password_err)){
+           $sql = "SELECT id, name, email, password FROM users WHERE email = ?";
+           if($stmt = mysqli_prepare($link, $sql)){
+               mysqli_stmt_bind_param($stmt, "s", $param_email);
+               $param_email = $email;
+               if(mysqli_stmt_execute($stmt)){
+                   mysqli_stmt_store_result($stmt);
+                   if(mysqli_stmt_num_rows($stmt) == 1){
+                       mysqli_stmt_bind_result($stmt, $id, $name, $email, $hashed_password);
+                       if(mysqli_stmt_fetch($stmt)){
+                           if(password_verify($password, $hashed_password)){
+                               session_start();
+                               $_SESSION["loggedin"] = true;
+                               $_SESSION["id"] = $id;
+                               $_SESSION["name"] = $name;
+                               $_SESSION["email"] = $email;
+                               header("location: index.php");
+                           } else{
+                               $login_err = "Invalid email or password.";
+                           }
+                       }
+                   } else{
+                       $login_err = "Invalid email or password.";
+                   }
+               } else{
+                   echo "Oops! Something went wrong. Please try again later.";
+               }
+               mysqli_stmt_close($stmt);
+           }
+       }
+       mysqli_close($link);
+   }
+   ?>
+
+   <?php include('../includes/header.php'); ?>
+   <h2>Login</h2>
+   <p>Please fill in your credentials to login.</p>
+   <?php 
+   if(!empty($login_err)){
+       echo '<div>' . $login_err . '</div>';
+   }        
+   ?>
+   <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+       <div>
+           <label>Email</label>
+           <input type="text" name="email" value="<?php echo $email; ?>">
+           <span><?php echo $email_err; ?></span>
+       </div>    
+       <div>
+           <label>Password</label>
+           <input type="password" name="password">
+           <span><?php echo $password_err; ?></span>
+       </div>
+       <div>
+           <input type="submit" value="Login">
+       </div>
+       <p>Don't have an account? <a href="register.php">Sign up now</a>.</p>
+   </form>
+   <?php include('../includes/footer.php'); ?>
+   ```
+
+### Step 7: Test the Setup
+
+1. **Run XAMPP**:
+   - Start Apache and MySQL.
+
+2. **Access the Project**:
+   - Open a browser and go to `http://localhost/HotelBookingSystem/public/index.php`.
+
+You should see the homepage, and you can navigate to the registration and login pages to test the user authentication system.
+
+This setup covers the initial stages of your Hotel Booking System project. From here, you can expand the functionality by adding room management, booking management, and payment processing features. If you need further assistance or specific features to be implemented, feel free to ask!
