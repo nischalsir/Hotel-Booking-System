@@ -55,7 +55,8 @@ a {
     --main-width: 1280px;
     --main-side-margin: 1rem;
     --main-side-padding: 1rem;
-
+    --light-bg-color: #f5f5f5;
+    --light-text-color: #000;
 }
 
 body {
@@ -224,32 +225,4 @@ body {
         display: flex;
         cursor: pointer;
     }
-}
-
-#theme-toggle .sun-icon {
-    position: absolute;
-    top: 0;
-    left: 0;
-    opacity: 0;
-    transform: rotate(90deg);
-}
-
-body.light-mode #theme-toggle .moon-icon {
-    opacity: 0;
-    transform: rotate(-90deg);
-}
-
-body.light-mode #theme-toggle .sun-icon {
-    opacity: 1;
-    transform: rotate(0deg);
-}
-
-body.dark-mode #theme-toggle .moon-icon {
-    opacity: 1;
-    transform: rotate(0deg);
-}
-
-body.dark-mode #theme-toggle .sun-icon {
-    opacity: 0;
-    transform: rotate(90deg);
 }

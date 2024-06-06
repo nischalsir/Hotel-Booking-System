@@ -5,6 +5,8 @@
     <title>Left aligned</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link href="../public/css/header.css" type="text/css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
 </head>
 <body>
 
@@ -16,6 +18,10 @@
             <input type="checkbox" id="navigation_toggle" name="dropdown">
             <div class="navigation_extras">
                 <!-- Right side menu -->
+                <button id="theme-toggle" aria-label="Toggle Dark/Light Mode">
+                    <i class="ri-moon-fill icon moon-icon"></i>
+                    <i class="ri-sun-fill icon sun-icon"></i>
+                </button>
                 <a href="../public/login-user.php" class="navigation_signin">Sign in</a>
 
                 <label for="navigation_toggle">
@@ -53,19 +59,19 @@
                         <a href="#hero" class="navigation_link">Home</a>
                     </li>
                     <li class="navigation_item">
-                        <a href="#about" class="navigation_link">About</a>
+                        <a href="#about" class="navigation_link">Booking</a>
                     </li>
                     <li class="navigation_item">
-                        <a href="#services" class="navigation_link">Services</a>
+                        <a href="#services" class="navigation_link">About</a>
                     </li>
                     <li class="navigation_item">
-                        <a href="#training" class="navigation_link">Features</a>
+                        <a href="#training" class="navigation_link">Contact</a>
                     </li>
                 </ul>
             </div>
-
         </nav>
     </div>
 </header>
+<script src="../public/js/header.js"></script>
 </body>
 </html>
