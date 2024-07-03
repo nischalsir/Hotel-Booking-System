@@ -1,53 +1,395 @@
+/* Importing static fonts */
+@font-face {
+    font-family: "Poppins";
+    src: url(../fonts/Poppins-Regular.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "Poppins Medium";
+    src: url(../fonts/Poppins-Medium.ttf) format("truetype");
+}
+
+/* Importing Google Fonts */
 @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
-html,body{
-    background: #6665ee;
+
+/* Minimal CSS reset for browser compatibility */
+body {
+    scroll-behavior: smooth;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+ul[class], ol[class] {
+    list-style: none;
+}
+
+input, button, textarea, select {
+    font: inherit;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+a {
+    text-decoration: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+/* Declaring global custom CSS properties */
+:root {
+    --main-width: 1280px;
+    --main-side-margin: 1rem;
+    --main-side-padding: 1rem;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f3f4f6;
+    font-size: .875rem;
+    color: #69699b;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #f5f5f5;
+}
+
+.main_container {
+    width: 100%;
+    max-width: var(--main-width);
+    padding: 0 var(--main-side-padding);
+    margin: 0 auto;
+}
+
+/* Main navigation bar */
+.header_navigation {
+    position: fixed;
+    background-color: #FFFFFF;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    box-shadow: rgba(149, 149, 149, 0.15) 0 3px 10px;
+    transition: background-color 0.3s;
+}
+
+.header_navigation.dark-mode {
+    background-color: #1a1a1a;
+}
+
+.navigation_bar {
+    font-family: 'Poppins Medium', sans-serif;
+    padding: var(--main-side-padding);
+    height: 3.5rem;
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navigation_container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 2.5rem;
+}
+
+.navigation_logo {
+    display: flex;
+    z-index: 110;
+    font-size: 2rem; /* Increase the font size for the logo */
+}
+
+.navigation_menu {
+    display: flex;
+    align-items: center;
+}
+
+.navigation_list {
+    padding: 0;
+    order: 0;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    column-gap: 1rem;
+}
+
+.navigation_item {
+    width: 100%;
+}
+
+.navigation_link {
+    display: flex;
+    cursor: pointer;
+    position: relative;
+    align-items: center;
+    white-space: nowrap;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    color: #69699b;
+    width: 100%;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.navigation_link:hover {
+    background-color: #eff0f1;
+}
+
+.navigation_signin {
+    display: flex;
+    cursor: pointer;
+    position: relative;
+    align-items: center;
+    white-space: nowrap;
+    background-color: #98cd04;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    color: #FFFFFF;
+}
+
+.navigation_signin:hover {
+    background-color: #80b404;
+}
+
+.theme_toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.theme_toggle i {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    transition: transform 0.5s ease;
+}
+
+#sun_icon {
+    display: none;
+    color: #FFD700;
+}
+
+body.dark-mode #sun_icon {
+    display: block;
+    transform: rotate(360deg);
+}
+
+body.dark-mode #moon_icon {
+    display: none;
+    transform: rotate(-360deg);
+}
+
+body.dark-mode .navigation_link {
+    color: #f5f5f5;
+}
+
+body.dark-mode .navigation_link:hover {
+    background-color: #333333;
+}
+
+body.dark-mode .navigation_signin {
+    background-color: #555555;
+}
+
+body.dark-mode .navigation_signin:hover {
+    background-color: #666666;
+}
+
+body.dark-mode .navigation_extras {
+    color: #f5f5f5;
+}
+
+/* Custom toggle(checkbox) for the mobile version */
+[type="checkbox"]:checked,
+[type="checkbox"]:not(:checked) {
+    position: absolute;
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#navigation_toggle:checked ~ .navigation_extras label,
+#navigation_toggle:not(:checked) ~ .navigation_extras label {
+    display: none;
+}
+
+.navigation_extras {
+    display: flex;
+    align-items: center;
+    column-gap: 1rem;
+    color: #69699b;
+    z-index: 110;
+    order: 1;
+}
+
+@media screen and (max-width: 900px) {
+    #navigation_toggle:checked ~ .navigation_extras label,
+    #navigation_toggle:not(:checked) ~ .navigation_extras label {
+        display: flex;
+    }
+
+    #navigation_toggle:not(:checked) ~ .navigation_extras label .navigation_close,
+    #navigation_toggle:checked ~ .navigation_extras label .navigation_open {
+        display: none;
+    }
+
+    .navigation_container .navigation_list {
+        position: fixed;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        top: -100%;
+        left: 0;
+        padding: 4rem 1rem 1rem 1rem;
+        row-gap: 1rem;
+        transition: .3s;
+        background-color: #FFFFFF;
+        box-shadow: rgba(149, 149, 149, 0.15) 0 3px 10px;
+    }
+
+    body.dark-mode .navigation_container .navigation_list {
+        background-color: #1a1a1a;
+    }
+
+    .navigation_list .navigation_link {
+        padding: 0.60rem 1rem;
+    }
+
+    #navigation_toggle:checked ~ .navigation_container .navigation_list {
+        top: 0;
+    }
+
+    #navigation_toggle:not(:checked) ~ .navigation_extras label .navigation_open,
+    #navigation_toggle:checked ~ .navigation_extras label .navigation_close {
+        display: flex;
+        cursor: pointer;
+    }
+}
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin-reverse {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(-360deg);
+    }
+}
+
+.theme_toggle i {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    transition: transform 0.5s ease;
+}
+
+#sun_icon,
+#moon_icon {
+    transition: transform 0.5s ease;
+}
+
+#sun_icon.spin,
+#moon_icon.spin {
+    animation: spin 0.5s forwards;
+}
+
+#sun_icon.spin-reverse,
+#moon_icon.spin-reverse {
+    animation: spin-reverse 0.7s forwards;
+}
+
+body.dark-mode #sun_icon {
+    display: block;
+    color: #FFD700;
+}
+
+body.dark-mode #moon_icon {
+    display: none;
+}
+
+body:not(.dark-mode) #sun_icon {
+    display: none;
+}
+
+body:not(.dark-mode) #moon_icon {
+    display: block;
+    color: #69699b;
+}
+
+/* Form styles */
+html, body {
     font-family: 'Poppins', sans-serif;
 }
-::selection{
-    color: #fff;
-    background: #6665ee;
-}
-.container{
+
+.container {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
-.container .form{
+
+.container .form {
     background: #fff;
     padding: 30px 35px;
     border-radius: 5px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
-.container .form form .form-control{
+
+.container .form form .form-control {
     height: 40px;
     font-size: 15px;
 }
-.container .form form .forget-pass{
+
+.container .form form .forget-pass {
     margin: -15px 0 15px 0;
 }
-.container .form form .forget-pass a{
-   font-size: 15px;
+
+.container .form form .forget-pass a {
+    font-size: 15px;
 }
-.container .form form .button{
-    background: #6665ee;
+
+.container .form form .button {
+    background: #98CD04;
     color: #fff;
     font-size: 17px;
     font-weight: 500;
     transition: all 0.3s ease;
 }
-.container .form form .button:hover{
-    background: #5757d1;
+
+.container .form form .button:hover {
+    background: #7ba800;
 }
-.container .form form .link{
+
+.container .form form .link {
     padding: 5px 0;
 }
-.container .form form .link a{
+
+.container .form form .link a {
     color: #6665ee;
 }
-.container .login-form form p{
+
+.container .login-form form p {
     font-size: 14px;
 }
-.container .row .alert{
+
+.container .row .alert {
     font-size: 14px;
 }

@@ -1,5 +1,4 @@
 /* Importing static fonts */
-
 @font-face {
     font-family: "Poppins";
     src: url(../fonts/Poppins-Regular.ttf) format("truetype");
@@ -10,10 +9,7 @@
     src: url(../fonts/Poppins-Medium.ttf) format("truetype");
 }
 
-/* END */
-
 /* Minimal CSS reset for browser compatibility */
-
 body {
     scroll-behavior: smooth;
 }
@@ -46,17 +42,11 @@ a {
     cursor: pointer;
 }
 
-/* END */
-
 /* Declaring global custom CSS properties */
-
 :root {
-
     --main-width: 1280px;
     --main-side-margin: 1rem;
     --main-side-padding: 1rem;
-    --light-bg-color: #f5f5f5;
-    --light-text-color: #000;
 }
 
 body {
@@ -68,6 +58,11 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #f5f5f5;
+}
+
 .main_container {
     width: 100%;
     max-width: var(--main-width);
@@ -76,7 +71,6 @@ body {
 }
 
 /* Main navigation bar */
-
 .header_navigation {
     position: fixed;
     background-color: #FFFFFF;
@@ -85,13 +79,17 @@ body {
     left: 0;
     z-index: 100;
     box-shadow: rgba(149, 149, 149, 0.15) 0 3px 10px;
+    transition: background-color 0.3s;
+}
+
+.header_navigation.dark-mode {
+    background-color: #1a1a1a;
 }
 
 .navigation_bar {
     font-family: 'Poppins Medium', sans-serif;
     padding: var(--main-side-padding);
     height: 3.5rem;
-
     display: flex;
     flex-direction: row;
     align-content: center;
@@ -109,6 +107,7 @@ body {
 .navigation_logo {
     display: flex;
     z-index: 110;
+    font-size: 2rem; /* Increase the font size for the logo */
 }
 
 .navigation_menu {
@@ -119,7 +118,6 @@ body {
 .navigation_list {
     padding: 0;
     order: 0;
-
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -140,6 +138,7 @@ body {
     border-radius: 4px;
     color: #69699b;
     width: 100%;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .navigation_link:hover {
@@ -162,8 +161,54 @@ body {
     background-color: #80b404;
 }
 
-/* Custom toggle(checkbox) for the mobile version */
+.theme_toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
 
+.theme_toggle i {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    transition: transform 0.5s ease;
+}
+
+#sun_icon {
+    display: none;
+    color: #FFD700;
+}
+
+body.dark-mode #sun_icon {
+    display: block;
+    transform: rotate(360deg);
+}
+
+body.dark-mode #moon_icon {
+    display: none;
+    transform: rotate(-360deg);
+}
+
+body.dark-mode .navigation_link {
+    color: #f5f5f5;
+}
+
+body.dark-mode .navigation_link:hover {
+    background-color: #333333;
+}
+
+body.dark-mode .navigation_signin {
+    background-color: #555555;
+}
+
+body.dark-mode .navigation_signin:hover {
+    background-color: #666666;
+}
+
+body.dark-mode .navigation_extras {
+    color: #f5f5f5;
+}
+
+/* Custom toggle(checkbox) for the mobile version */
 [type="checkbox"]:checked,
 [type="checkbox"]:not(:checked) {
     position: absolute;
@@ -187,7 +232,6 @@ body {
 }
 
 @media screen and (max-width: 900px) {
-
     #navigation_toggle:checked ~ .navigation_extras label,
     #navigation_toggle:not(:checked) ~ .navigation_extras label {
         display: flex;
@@ -212,6 +256,10 @@ body {
         box-shadow: rgba(149, 149, 149, 0.15) 0 3px 10px;
     }
 
+    body.dark-mode .navigation_container .navigation_list {
+        background-color: #1a1a1a;
+    }
+
     .navigation_list .navigation_link {
         padding: 0.60rem 1rem;
     }
@@ -225,4 +273,60 @@ body {
         display: flex;
         cursor: pointer;
     }
+}
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin-reverse {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(-360deg);
+    }
+}
+
+.theme_toggle i {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    transition: transform 0.5s ease;
+}
+
+#sun_icon,
+#moon_icon {
+    transition: transform 0.5s ease;
+}
+
+#sun_icon.spin,
+#moon_icon.spin {
+    animation: spin 0.5s forwards;
+}
+
+#sun_icon.spin-reverse,
+#moon_icon.spin-reverse {
+    animation: spin-reverse 0.7s forwards;
+}
+
+body.dark-mode #sun_icon {
+    display: block;
+    color: #FFD700;
+}
+
+body.dark-mode #moon_icon {
+    display: none;
+}
+
+body:not(.dark-mode) #sun_icon {
+    display: none;
+}
+
+body:not(.dark-mode) #moon_icon {
+    display: block;
+    color: #69699b;
 }
