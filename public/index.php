@@ -18,7 +18,7 @@
         <li class="nav-link"><a href="#">Facilities</a></li>
         <li class="nav-link"><a href="#">Contact</a></li>
         <li class="nav-link"><a href="#">About</a></li>
-        <button class="btn"><a href="login-user.php">Sign In</a></button>
+        <button class="btn">Sign In</button>
       </ul>
     </nav>
     <header class="header">
