@@ -13,12 +13,12 @@
     <nav>
       <div class="logo">Bharatpur Terminal In</div>
       <ul class="nav-links">
-        <li class="nav-link"><a href="#">Home</a></li>
+        <li class="nav-link"><a href="index.php">Home</a></li>
         <li class="nav-link"><a href="#">Rooms</a></li>
         <li class="nav-link"><a href="#">Facilities</a></li>
         <li class="nav-link"><a href="#">Contact</a></li>
         <li class="nav-link"><a href="#">About</a></li>
-        <button class="btn">Sign In</button>
+        <a href="login-user.php"><button class="btn">Sign In</button></a>
       </ul>
     </nav>
     <header class="header">

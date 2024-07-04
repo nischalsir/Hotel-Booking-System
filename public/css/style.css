@@ -85,6 +85,7 @@ nav {
   font-weight: 500;
   color: var(--text-light);
   transition: 0.3s;
+  text-decoration: none;
 }
 
 .nav-link a:hover {
