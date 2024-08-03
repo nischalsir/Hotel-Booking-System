@@ -8,13 +8,13 @@
 </head>
 <body>
         <nav>
-        <div class="logo">Bharatpur Terminal In</div>
+        <div class="logo">HBS</div>
         <ul class="nav-links">
           <li class="nav-link"><a href="index.php">Home</a></li>
           <li class="nav-link"><a href="#">Rooms</a></li>
-          <li class="nav-link"><a href="#">Facilities</a></li>
-          <li class="nav-link"><a href="#">Contact</a></li>
-          <li class="nav-link"><a href="#">About</a></li>
+          <li class="nav-link"><a href="facilities.php">Facilities</a></li>
+          <li class="nav-link"><a href="contact.php">Contact</a></li>
+          <li class="nav-link"><a href="about.php">About</a></li>
         </ul>
       </nav>
   <header class="header">

@@ -242,9 +242,32 @@ nav {
   color: var (--text-dark);
 }
 
+.card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  aspect-ratio: 16 / 9; /* Adjust this ratio as needed */
+}
+
 .card-content p {
   color: var(--text-light);
 }
+
+.card .card-content .feature {
+  display: inline-block;
+  padding: 0.25em 0.6em;
+  font-size: 0.75em;
+  font-weight: 700;
+  line-height: 1;
+  color: #212529;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 10rem;
+  background-color: #f8f9fa;
+}
+
 
 .card:hover{
   transform: scale(1.05);
@@ -325,6 +348,56 @@ nav {
 .reward .btn:hover {
   background-color: var(--primary-color-dark);
 }
+
+/* General styles for form */
+.contact-form {
+  margin-top: 2rem;
+}
+
+.contact-form form {
+  display: grid;
+  grid-gap: 1rem;
+}
+
+.contact-form .form-group {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+.contact-form label {
+  font-weight: bold;
+}
+
+.contact-form input[type="text"],
+.contact-form input[type="email"],
+.contact-form textarea {
+  width: 100%;
+  padding: 0.75rem; /* Increased padding */
+  font-size: 1.1rem; /* Increased font size */
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+}
+
+.contact-form textarea {
+  resize: vertical; /* Allow vertical resizing of textarea */
+}
+
+.contact-form button.btn {
+  padding: 0.9rem 1.2rem; /* Increased padding */
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 1.1rem; /* Increased font size */
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.contact-form button.btn:hover {
+  background-color: #0056b3;
+}
+
 
 .footer {
   background-color: var(--extra-light);

@@ -7,17 +7,18 @@
       href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css"
       rel="stylesheet">
     <link rel="stylesheet" href="css/index.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <title>HWIC</title>
   </head>
   <body>
     <nav>
-      <div class="logo">Bharatpur Terminal In</div>
+      <div class="logo">HBS</div>
       <ul class="nav-links">
         <li class="nav-link"><a href="index.php">Home</a></li>
         <li class="nav-link"><a href="#">Rooms</a></li>
-        <li class="nav-link"><a href="#">Facilities</a></li>
-        <li class="nav-link"><a href="#">Contact</a></li>
-        <li class="nav-link"><a href="#">About</a></li>
+        <li class="nav-link"><a href="facilities.php">Facilities</a></li>
+        <li class="nav-link"><a href="contact.php">Contact</a></li>
+        <li class="nav-link"><a href="about.php">About</a></li>
         <a href="login-user.php"><button class="btn">Sign In</button></a>
       </ul>
     </nav>
@@ -66,16 +67,31 @@
     <section class="section">
       <h2 class="section-title">Popular Hotels</h2>
       <div class="grid">
-        <div class="card">
-          <img src="assets/hotel-1.jpg" alt="popular hotel" />
-          <div class="card-content">
-            <div class="card-header">
-              <h4>The Plaza Hotel</h4>
-              <h4>$499</h4>
+        
+      <div class="card">
+            <img src="assets/hotel-1.jpg" alt="popular hotel" />
+            <div class="card-content">
+                <div class="card-header">
+                    <h4>The Plaza Hotel</h4>
+                    <h4>रु 1199</h4>
+                </div>
+                <div class="features">
+                    <span class="feature">2 Beds</span>
+                    <span class="feature">Free Wi-Fi</span>
+                    <span class="feature">Breakfast Included</span>
+                    <span class="feature">Swimming Pool</span>
+                </div>
+                <div class="feature">
+                  <i class='bx bxs-star' style='color:#ffe200'></i>
+                  <i class='bx bxs-star' style='color:#ffe200'  ></i>
+                  <i class='bx bxs-star' style='color:#ffe200'  ></i>
+                  <i class='bx bxs-star-half' style='color:#ffe200' ></i>
+                  <i class='bx bx-star' style='color:#ffe200' ></i>
+                </div>
+                <p>New York City, USA</p>
             </div>
-            <p>New York City, USA</p>
-          </div>
         </div>
+
         <div class="card">
           <img src="assets/hotel-2.jpg" alt="popular hotel" />
           <div class="card-content">
@@ -162,7 +178,7 @@
       <div class="reward-content">
         <p>100+ discount codes</p>
         <h4>Register and discover amazing discounts on your booking.</h4>
-        <button class="btn">Register</button>
+        <button class="btn"><a href="./signup-user.php">Register</a></button>
       </div>
     </section>
 
