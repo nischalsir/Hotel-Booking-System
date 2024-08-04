@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/style.css">
-  <title>HWIC - Sign In</title>
+  <title>HBS - Sign In</title>
 </head>
 <body>
         <nav>
         <div class="logo">HBS</div>
         <ul class="nav-links">
           <li class="nav-link"><a href="index.php">Home</a></li>
-          <li class="nav-link"><a href="#">Rooms</a></li>
+          <li class="nav-link"><a href="book.php">Rooms</a></li>
           <li class="nav-link"><a href="facilities.php">Facilities</a></li>
           <li class="nav-link"><a href="contact.php">Contact</a></li>
           <li class="nav-link"><a href="about.php">About</a></li>
@@ -45,17 +45,18 @@
       </div>
     </div>
   </header>
+  
   <footer class="footer">
       <div class="section">
         <div class="footer-col">
-          <h3>WDM&Co</h3>
+          <h3>HBS</h3>
           <p>
-            WDM&Co is a premier hotel booking website that offers a seamless and
+            HBS is a premier hotel booking website that offers a seamless and
             convenient way to find and book accommodations worldwide.
           </p>
           <p>
             With a user-friendly interface and a vast selection of hotels,
-            WDM&Co aims to provide a stress-free experience for travelers
+            HBS aims to provide a stress-free experience for travelers
             seeking the perfect stay.
           </p>
         </div>
@@ -81,7 +82,7 @@
         </div>
       </div>
       <div class="footer-bar">
-        Copyright © 2024 Nischal Pandey. All rights reserved.
+        Copyright © 2023 Hotel Booking System. All rights reserved.
       </div>
     </footer>
 </body>

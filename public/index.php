@@ -8,14 +8,14 @@
       rel="stylesheet">
     <link rel="stylesheet" href="css/index.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <title>HWIC</title>
+    <title>HBS - Home</title>
   </head>
   <body>
     <nav>
       <div class="logo">HBS</div>
       <ul class="nav-links">
         <li class="nav-link"><a href="index.php">Home</a></li>
-        <li class="nav-link"><a href="#">Rooms</a></li>
+        <li class="nav-link"><a href="book.php">Rooms</a></li>
         <li class="nav-link"><a href="facilities.php">Facilities</a></li>
         <li class="nav-link"><a href="contact.php">Contact</a></li>
         <li class="nav-link"><a href="about.php">About</a></li>
@@ -23,127 +23,154 @@
       </ul>
     </nav>
     <header class="header">
-      <div class="header-img">
-        <div class="header-content">
-          <h1>Enjoy Your Dream Vacation</h1>
-          <p>Book Hotels and stay packages at lowest price.</p>
-        </div>
-        <div class="booking">
-          <form>
-            <div class="form-group">
-              <div class="input-group">
-                <input type="text" required />
-                <label>Location</label>
-              </div>
-              <p>Where are you going?</p>
-            </div>
-            <div class="form-group">
-              <div class="input-group">
-                <input type="date" required />
-                <label>Check In</label>
-              </div>
-              <p>Add date</p>
-            </div>
-            <div class="form-group">
-              <div class="input-group">
-                <input type="date" required />
-                <label>Check Out</label>
-              </div>
-              <p>Add date</p>
-            </div>
-            <div class="form-group">
-              <div class="input-group">
-                <input type="number" required />
-                <label>Guests</label>
-              </div>
-              <p>Add guests</p>
-            </div>
-          </form>
-          <button class="btn"><i class="ri-search-line"></i></button>
-        </div>        
-      </div>
-    </header>
+  <div class="header-img">
+    <div class="header-content">
+      <h1>Enjoy Your Dream Vacation</h1>
+      <p>Book Hotels and stay packages at the lowest price.</p>
+    </div>
+  </div>
+</header>
 
     <section class="section">
-      <h2 class="section-title">Popular Hotels</h2>
-      <div class="grid">
-        
-      <div class="card">
-            <img src="assets/hotel-1.jpg" alt="popular hotel" />
-            <div class="card-content">
-                <div class="card-header">
-                    <h4>The Plaza Hotel</h4>
-                    <h4>रु 1199</h4>
-                </div>
-                <div class="features">
-                    <span class="feature">2 Beds</span>
-                    <span class="feature">Free Wi-Fi</span>
-                    <span class="feature">Breakfast Included</span>
-                    <span class="feature">Swimming Pool</span>
-                </div>
-                <div class="feature">
-                  <i class='bx bxs-star' style='color:#ffe200'></i>
-                  <i class='bx bxs-star' style='color:#ffe200'  ></i>
-                  <i class='bx bxs-star' style='color:#ffe200'  ></i>
-                  <i class='bx bxs-star-half' style='color:#ffe200' ></i>
-                  <i class='bx bx-star' style='color:#ffe200' ></i>
-                </div>
-                <p>New York City, USA</p>
-            </div>
-        </div>
+  <h2 class="section-title">Popular Rooms</h2>
+  <div class="grid">
 
-        <div class="card">
-          <img src="assets/hotel-2.jpg" alt="popular hotel" />
-          <div class="card-content">
-            <div class="card-header">
-              <h4>Ritz Paris</h4>
-              <h4>$549</h4>
-            </div>
-            <p>Paris, France</p>
-          </div>
+    <a href="book.php" class="card">
+      <img src="images/deluxe-room.jpeg" alt="popular room" />
+      <div class="card-content">
+        <div class="card-header">
+          <h4>Deluxe Room</h4>
+          <h4>रु 2,500</h4> 
         </div>
-        <div class="card">
-          <img src="assets/hotel-3.jpg" alt="popular hotel" />
-          <div class="card-content">
-            <div class="card-header">
-              <h4>The Peninsula</h4>
-              <h4>$599</h4>
-            </div>
-            <p>Hong Kong</p>
-          </div>
+        <div class="features">
+          <span class="feature">2 Beds</span>
+          <span class="feature">Free Wi-Fi</span>
+          <span class="feature">Breakfast Included</span>
         </div>
-        <div class="card">
-          <img src="assets/hotel-4.jpg" alt="popular hotel" />
-          <div class="card-content">
-            <div class="card-header">
-              <h4>Atlantis The Palm</h4>
-              <h4>$449</h4>
-            </div>
-            <p>Dubai, United Arab Emirates</p>
-          </div>
-        </div>
-        <div class="card">
-          <img src="assets/hotel-5.jpg" alt="popular hotel" />
-          <div class="card-content">
-            <div class="card-header">
-              <h4>The Ritz-Carlton</h4>
-              <h4>$649</h4>
-            </div>
-            <p>Tokyo, Japan</p>
-          </div>
-        </div>
-        <div class="card">
-          <img src="assets/hotel-6.jpg" alt="popular hotel" />
-          <div class="card-content">
-            <div class="card-header">
-              <h4>Marina Bay Sands</h4>
-              <h4>$549</h4>
-            </div>
-            <p>Singapore</p>
-          </div>
+        <div class="feature">
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bx-star' style='color:#ffe200'></i>
         </div>
       </div>
-    </section>
+    </a>
+
+    <a href="book.php" class="card">
+      <img src="images/luxury-room.jpeg" alt="popular room" />
+      <div class="card-content">
+        <div class="card-header">
+          <h4>Luxury Room</h4>
+          <h4>रु 6,000</h4> 
+        </div>
+        <div class="features">
+          <span class="feature">1 King Bed</span>
+          <span class="feature">Free Wi-Fi</span>
+          <span class="feature">Mini Bar</span>
+        </div>
+        <div class="feature">
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+        </div>
+      </div>
+    </a>
+
+    <a href="book.php" class="card">
+      <img src="images/suite-room.jpeg" alt="popular room" />
+      <div class="card-content">
+        <div class="card-header">
+          <h4>Suite Room</h4>
+          <h4>रु 7,500</h4>
+        </div>
+        <div class="features">
+          <span class="feature">2 Beds</span>
+          <span class="feature">Free Wi-Fi</span>
+          <span class="feature">Living Area</span>
+        </div>
+        <div class="feature">
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star-half' style='color:#ffe200'></i>
+        </div>
+      </div>
+    </a>
+
+    <a href="book.php" class="card">
+      <img src="images/presidential-suite.jpeg" alt="popular room" />
+      <div class="card-content">
+        <div class="card-header">
+          <h4>Presidential Suite</h4>
+          <h4>रु 12,000</h4>
+        </div>
+        <div class="features">
+          <span class="feature">3 Beds</span>
+          <span class="feature">Free Wi-Fi</span>
+          <span class="feature">Swimming Pool</span>
+          <span class="feature">Private Balcony</span>
+        </div>
+        <div class="feature">
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+        </div>
+      </div>
+    </a>
+
+    <a href="book.php" class="card">
+      <img src="images/executive-room.jpeg" alt="popular room" />
+      <div class="card-content">
+        <div class="card-header">
+          <h4>Executive Room</h4>
+          <h4>रु 8,000</h4>
+        </div>
+        <div class="features">
+          <span class="feature">1 King Bed</span>
+          <span class="feature">Free Wi-Fi</span>
+          <span class="feature">Executive Desk</span>
+        </div>
+        <div class="feature">
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bx-star' style='color:#ffe200'></i>
+        </div>
+      </div>
+    </a>
+
+    <a href="book.php" class="card">
+      <img src="images/standard-room.jpeg" alt="popular room" />
+      <div class="card-content">
+        <div class="card-header">
+          <h4>Standard Room</h4>
+          <h4>रु 4,000</h4>
+        </div>
+        <div class="features">
+          <span class="feature">1 Bed</span>
+          <span class="feature">Free Wi-Fi</span>
+          <span class="feature">Basic Amenities</span>
+        </div>
+        <div class="feature">
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star' style='color:#ffe200'></i>
+          <i class='bx bxs-star-half' style='color:#ffe200'></i>
+          <i class='bx bx-star' style='color:#ffe200'></i>
+        </div>
+      </div>
+    </a>
+
+  </div>
+</section>
+
 
     <section class="section client">
       <div class="section">
@@ -178,21 +205,21 @@
       <div class="reward-content">
         <p>100+ discount codes</p>
         <h4>Register and discover amazing discounts on your booking.</h4>
-        <button class="btn"><a href="./signup-user.php">Register</a></button>
+        <a href="login-user.php"><button class="btn">Register</button></a>
       </div>
     </section>
 
     <footer class="footer">
       <div class="section">
         <div class="footer-col">
-          <h3>WDM&Co</h3>
+          <h3>HBS</h3>
           <p>
-            WDM&Co is a premier hotel booking website that offers a seamless and
+            HBS is a premier hotel booking website that offers a seamless and
             convenient way to find and book accommodations worldwide.
           </p>
           <p>
             With a user-friendly interface and a vast selection of hotels,
-            WDM&Co aims to provide a stress-free experience for travelers
+            HBS aims to provide a stress-free experience for travelers
             seeking the perfect stay.
           </p>
         </div>
@@ -218,7 +245,7 @@
         </div>
       </div>
       <div class="footer-bar">
-        Copyright © 2023 Web Design Mastery. All rights reserved.
+        Copyright © 2023 Hotel Booking System. All rights reserved.
       </div>
     </footer>
   </body>
