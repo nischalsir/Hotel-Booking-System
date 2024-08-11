@@ -5,49 +5,92 @@ $email = "";
 $name = "";
 $errors = array();
 
-    //if user signup button
-    if (isset($_POST['signup'])) {
-        $name = mysqli_real_escape_string($con, $_POST['name']);
-        $email = mysqli_real_escape_string($con, $_POST['email']);
-        $phone = mysqli_real_escape_string($con, $_POST['phone']);
-        $password = mysqli_real_escape_string($con, $_POST['password']);
-        
-        $email_check = "SELECT * FROM usertable WHERE email = '$email'";
-        $res = mysqli_query($con, $email_check);
-        
-        if (mysqli_num_rows($res) > 0) {
-            $errors['email'] = "Email that you have entered already exists!";
-        }
+// If user signup button is clicked
+if (isset($_POST['signup'])) {
+    $name = mysqli_real_escape_string($con, $_POST['name']);
+    $email = mysqli_real_escape_string($con, $_POST['email']);
+    $phone = mysqli_real_escape_string($con, $_POST['phone']);
+    $password = mysqli_real_escape_string($con, $_POST['password']);
+    $gender = mysqli_real_escape_string($con, $_POST['gender']);
+    $terms_agreed = isset($_POST['terms']) ? 1 : 0;
 
-        if (count($errors) === 0) {
-            $encpass = password_hash($password, PASSWORD_BCRYPT);
-            $code = rand(999999, 111111);
-            $status = "notverified";
-            
-            $insert_data = "INSERT INTO usertable (name, email, phone, password, code, status)
-                            VALUES ('$name', '$email', '$phone', '$encpass', '$code', '$status')";
-            $data_check = mysqli_query($con, $insert_data);
-            
-            if ($data_check) {
-                $subject = "Email Verification Code";
-                $message = "Your verification code is $code";
-                $sender = "From: Hotel Booking System";
-                
-                if (mail($email, $subject, $message, $sender)) {
-                    $info = "We've sent a verification code to your email - $email";
-                    $_SESSION['info'] = $info;
-                    $_SESSION['email'] = $email;
-                    $_SESSION['password'] = $password;
-                    header('location: user-otp.php');
-                    exit();
-                } else {
-                    $errors['otp-error'] = "Failed while sending code!";
-                }
+    // Handle profile picture upload
+    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+        $fileTmpPath = $_FILES['profile_picture']['tmp_name'];
+        $fileName = $_FILES['profile_picture']['name'];
+        $fileSize = $_FILES['profile_picture']['size'];
+        $fileType = $_FILES['profile_picture']['type'];
+        $fileNameCmps = explode(".", $fileName);
+        $fileExtension = strtolower(end($fileNameCmps));
+        
+        // Validate file extension
+        $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif');
+        if (in_array($fileExtension, $allowedExtensions)) {
+            // Validate file size (max 5MB)
+            if ($fileSize > 5242880) {
+                $errors['profile_picture'] = "File size exceeds the maximum limit of 5MB.";
             } else {
-                $errors['db-error'] = "Failed while inserting data into database!";
+                $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+                $uploadFileDir = 'C:/Users/nisch/OneDrive/Desktop/Project/HotelBookingSystem/admin/user_pic/';
+                $dest_path = $uploadFileDir . $newFileName;
+
+                if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                    $profile_picture = $dest_path;
+                } else {
+                    $errors['profile_picture'] = "There was an issue with the profile picture upload. Please try again.";
+                }
             }
+        } else {
+            $errors['profile_picture'] = "Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.";
+        }
+    } else {
+        $errors['profile_picture'] = "Please upload a valid profile picture.";
+    }
+
+    // Check if email already exists
+    $stmt = $con->prepare("SELECT * FROM usertable WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    
+    if (mysqli_num_rows($res) > 0) {
+        $errors['email'] = "Email that you have entered already exists!";
+    }
+
+    // Check if terms and conditions are agreed to
+    if ($terms_agreed !== 1) {
+        $errors['terms'] = "You must agree to the terms and conditions!";
+    }
+
+    if (count($errors) === 0) {
+        $encpass = password_hash($password, PASSWORD_BCRYPT);
+        $code = rand(999999, 111111);
+        $status = "notverified";
+        
+        $stmt = $con->prepare("INSERT INTO usertable (name, email, phone, password, profile_picture, gender, terms_agreed, code, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssssiss", $name, $email, $phone, $encpass, $profile_picture, $gender, $terms_agreed, $code, $status);
+        $data_check = $stmt->execute();
+        
+        if ($data_check) {
+            $subject = "Email Verification Code";
+            $message = "Your verification code is $code";
+            $sender = "From: Hotel Booking System";
+
+            if (mail($email, $subject, $message, $sender)) {
+                $info = "We've sent a verification code to your email - $email";
+                $_SESSION['info'] = $info;
+                $_SESSION['email'] = $email;
+                $_SESSION['password'] = $password;
+                header('location: user-otp.php');
+                exit();
+            } else {
+                $errors['otp-error'] = "Failed while sending code!";
+            }
+        } else {
+            $errors['db-error'] = "Failed while inserting data into database!";
         }
     }
+}
 
     //if user click verification code submit button
     if(isset($_POST['check'])){

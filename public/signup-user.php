@@ -1,132 +1,115 @@
 <?php require_once "../config/controllerUserData.php"; ?>
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link
-      href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css"
-      rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <title>HBS - SignUp</title>
-  </head>
-  <body>
+    <link rel="stylesheet" href="css/form.css">
+    <title>HBS - Sign Up</title>
+</head>
+<body>
     <nav>
-      <div class="logo">HBS</div>
-      <ul class="nav-links">
-        <li class="nav-link"><a href="index.php">Home</a></li>
-        <li class="nav-link"><a href="book.php">Rooms</a></li>
-        <li class="nav-link"><a href="facilities.php">Facilities</a></li>
-        <li class="nav-link"><a href="contact.php">Contact</a></li>
-        <li class="nav-link"><a href="about.php">About</a></li>
-      </ul>
+        <div class="logo">HBS</div>
+        <ul class="nav-links">
+            <li class="nav-link"><a href="index.php">Home</a></li>
+            <li class="nav-link"><a href="book.php">Rooms</a></li>
+            <li class="nav-link"><a href="facilities.php">Facilities</a></li>
+            <li class="nav-link"><a href="contact.php">Contact</a></li>
+            <li class="nav-link"><a href="about.php">About</a></li>
+        </ul>
     </nav>
-    <header class="header">
-      <div class="header-img">
-        <div class="header-content">
-          <h1>Sign Up</h1>
-          <p>Book Hotels and stay packages at lowest price.</p>
+    <div class="form">
+    <div class="card-container">
+            <div class="card">
+                <h2>Welcome to HBS</h2>
+                <p>Register now to enjoy our exclusive services and offers!</p>
+            </div>
         </div>
-        <div class="booking">
-        <?php
-                    if(count($errors) == 1){
-                        ?>
-                        <div class="alert alert-danger text-center">
-                            <?php
-                            foreach($errors as $showerror){
-                                echo $showerror;
-                            }
-                            ?>
-                        </div>
-                        <?php
-                    }elseif(count($errors) > 1){
-                        ?>
-                        <div class="alert alert-danger">
-                            <?php
-                            foreach($errors as $showerror){
-                                ?>
-                                <li><?php echo $showerror; ?></li>
-                                <?php
-                            }
-                            ?>
-                        </div>
-                        <?php
-                    }
+        <div class="container">
+            <div class="title">Registration</div>
+            <div class="content">
+                <?php
+                if (count($errors) == 1) {
                     ?>
-              <form action="signup-user.php" method="POST" autocomplete="">
-                <div class="form-group">
-                    <div class="input-group">
-                        <input type="text" name="name" required />
-                        <label>Name</label>
+                    <div class="alert alert-danger text-center">
+                        <?php
+                        foreach ($errors as $showerror) {
+                            echo $showerror;
+                        }
+                        ?>
                     </div>
-                    <p>Please enter your name</p>
-                </div>
-                <div class="form-group">
-                    <div class="input-group">
-                        <input type="email" name="email" required />
-                        <label>Email</label>
+                    <?php
+                } elseif (count($errors) > 1) {
+                    ?>
+                    <div class="alert alert-danger">
+                        <?php
+                        foreach ($errors as $showerror) {
+                            ?>
+                            <li><?php echo $showerror; ?></li>
+                            <?php
+                        }
+                        ?>
                     </div>
-                    <p>Enter your email</p>
-                </div>
-                <div class="form-group">
-                    <div class="input-group">
-                        <input type="number" name="phone" required />
-                        <label>Phone</label>
+                    <?php
+                }
+                ?>
+                <form action="signup-user.php" method="POST" enctype="multipart/form-data" autocomplete="off">
+                    <div class="user-details">
+                        <div class="input-box">
+                            <span class="details">Full Name</span>
+                            <input type="text" placeholder="Enter your name" name="name" id="name" required />
+                        </div>
+                        <div class="input-box">
+                            <span class="details">Email</span>
+                            <input type="email" placeholder="Enter your email" name="email" id="email" required>
+                        </div>
+                        <div class="input-box">
+                            <span class="details">Phone Number</span>
+                            <input type="number" placeholder="Enter your phone number" id="phone" name="phone" required>
+                        </div>
+                        <div class="input-box">
+                            <span class="details">Password</span>
+                            <input type="password" placeholder="Enter your password" id="password" name="password" required>
+                        </div>
+                        <div class="input-box">
+                            <span class="details">Upload Picture</span>
+                            <input type="file" name="profile_picture" id="profile_picture" required />
+                        </div>
                     </div>
-                    <p>Enter your contact number</p>
-                </div>
-                <div class="form-group">
-                    <div class="input-group">
-                        <input type="password" name="password" required />
-                        <label>Password</label>
+                    <div class="gender-details">
+                        <span class="gender-title">Gender</span>
+                        <div class="category">
+                            <label for="male">
+                                <input type="radio" id="male" name="gender" value="Male" required />
+                                <span class="dot one"></span>
+                                <span class="gender">Male</span>
+                            </label>
+                            <label for="female">
+                                <input type="radio" id="female" name="gender" value="Female" required />
+                                <span class="dot two"></span>
+                                <span class="gender">Female</span>
+                            </label>
+                            <label for="unknown">
+                                <input type="radio" id="unknown" name="gender" value="Unknown" required />
+                                <span class="dot three"></span>
+                                <span class="gender">Prefer not to say</span>
+                            </label>
+                        </div>
                     </div>
-                    <p>Enter password</p>
-                </div>
-                <button class="btn" type="submit" name="signup">Sign Up</button>
-            </form>
-          <p>Already have an account? <a href="login-user.php">Login</a></p>
-        </div>        
-      </div>
-    </header>
-
-    <footer class="footer">
-      <div class="section">
-        <div class="footer-col">
-          <h3>HBS</h3>
-          <p>
-            HBS is a premier hotel booking website that offers a seamless and
-            convenient way to find and book accommodations worldwide.
-          </p>
-          <p>
-            With a user-friendly interface and a vast selection of hotels,
-            HBS aims to provide a stress-free experience for travelers
-            seeking the perfect stay.
-          </p>
+                    <div>
+                        <input type="checkbox" id="terms" name="terms" required />
+                        I agree to the <a href="#">terms and conditions</a>
+                    </div>
+                    <div class="button">
+                        <input type="submit" name="signup" value="Sign Up">
+                    </div>
+                </form>
+                <p>Already have an account? <a href="login-user.php">Login</a></p>
+            </div>
         </div>
-        <div class="footer-col">
-          <h4>Company</h4>
-          <p>About Us</p>
-          <p>Our Team</p>
-          <p>Blog</p>
-          <p>Book</p>
-          <p>Contact Us</p>
-        </div>
-        <div class="footer-col">
-          <h4>Legal</h4>
-          <p>FAQs</p>
-          <p>Terms & Conditions</p>
-          <p>Privacy Policy</p>
-        </div>
-        <div class="footer-col">
-          <h4>Resources</h4>
-          <p>Social Media</p>
-          <p>Help Center</p>
-          <p>Partnerships</p>
-        </div>
-      </div>
-      <div class="footer-bar">
-        Copyright © 2023 Hotel Booking System. All rights reserved.
-      </div>
-    </footer>
-  </body>
+    </div>
+    <?php include "./include/footer.php"; ?>
+</body>
 </html>

@@ -16,28 +16,6 @@
   box-sizing: border-box;
 }
 
-.section {
-  max-width: var(--max-width);
-  margin: auto;
-  padding: 5rem 1rem;
-}
-
-.section-title {
-  font-size: 2rem;
-  font-weight: 600;
-  color: var(--text-dark);
-  text-align: center;
-}
-
-a {
-  text-decoration: none;
-}
-
-img {
-  width: 100%;
-  display: flex;
-}
-
 body {
   font-family: "Poppins", sans-serif;
 }
@@ -51,7 +29,7 @@ nav {
   justify-content: space-between;
 }
 
-.btn{
+.btn {
   display: inline-block;
   padding: 0.5rem 1rem;
   outline: none;
@@ -109,6 +87,7 @@ nav {
 .header-content {
   max-width: 600px;
   padding: 5rem 2rem;
+  color: var(--extra-light);
 }
 
 .header-content h1 {
@@ -117,13 +96,7 @@ nav {
   line-height: 4rem;
   font-weight: 600;
   color: var(--white);
-  display:flex;
-}
-
-.header-content {
-  max-width: 600px;
-  padding: 5rem 2rem;
-  color: var(--extra-light);
+  display: flex;
 }
 
 .header-content p {
@@ -140,14 +113,18 @@ nav {
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  text-align: right; /* Align form content to the right */
+  position: absolute;
+  top: 50%;
+  right: 10%;
+  transform: translateY(-50%);
 }
 
 .booking form {
   width: 100%;
   max-width: 600px;
   margin: auto;
-  text-align: left; /* Align form content to the left */
+  text-align: right; /* Align form content to the right */
 }
 
 .booking .btn {
@@ -174,18 +151,11 @@ nav {
   color: var(--text-light);
 }
 
-
 .input-group {
   width: 100%;
   position: relative;
   margin-bottom: 1.5rem;
 }
-
-.booking .input-group {
-  width: 100%;
-  position: relative;
-}
-
 
 .booking label {
   position: absolute;
@@ -221,29 +191,73 @@ nav {
   color: var(--text-light);
 }
 
-.booking .btn {
-  margin-top: 20px; /* Adjust margin as needed */
-  display: block; /* Change to block to center align */
-  width: 50%; /* Set a width if needed */
-  max-width: 200px; /* Set a maximum width if needed */
-  margin: auto; /* Center horizontally */
-  padding: 1rem 2rem;
-  outline: none;
-  border: none;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--white);
-  background-color: var(--primary-color);
-  border-radius: 0.5rem;
+/* Styles for profile picture upload */
+.file-upload {
+  display: block;
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.file-upload input[type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
   cursor: pointer;
-  transition: background-color 0.3s;
-  text-decoration: none;
 }
 
-.booking .btn:hover {
-  background-color: var(--primary-color-dark);
+.file-upload span {
+  display: block;
+  padding: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  border: 1px solid var(--primary-color);
+  border-radius: 0.5rem;
+  background-color: var(--white);
+  text-align: center;
 }
 
+.file-upload:hover span {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+/* Styles for gender radio buttons */
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.radio-group input[type="radio"] {
+  margin-right: 0.5rem;
+}
+
+.radio-group label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+/* Styles for terms and conditions checkbox */
+.terms-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.terms-checkbox input[type="checkbox"] {
+  accent-color: var(--primary-color);
+}
+
+.terms-checkbox a {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
 
 .footer {
   background-color: var(--extra-light);
