@@ -26,19 +26,14 @@ if (isset($_POST['signup'])) {
         // Validate file extension
         $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif');
         if (in_array($fileExtension, $allowedExtensions)) {
-            // Validate file size (max 5MB)
-            if ($fileSize > 5242880) {
-                $errors['profile_picture'] = "File size exceeds the maximum limit of 5MB.";
-            } else {
-                $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
-                $uploadFileDir = 'C:/Users/nisch/OneDrive/Desktop/Project/HotelBookingSystem/admin/user_pic/';
-                $dest_path = $uploadFileDir . $newFileName;
+            $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+            $uploadFileDir = './uploads/';
+            $dest_path = $uploadFileDir . $newFileName;
 
-                if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                    $profile_picture = $dest_path;
-                } else {
-                    $errors['profile_picture'] = "There was an issue with the profile picture upload. Please try again.";
-                }
+            if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                $profile_picture = $dest_path;
+            } else {
+                $errors['profile_picture'] = "There was an error moving the uploaded file.";
             }
         } else {
             $errors['profile_picture'] = "Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.";
@@ -48,10 +43,8 @@ if (isset($_POST['signup'])) {
     }
 
     // Check if email already exists
-    $stmt = $con->prepare("SELECT * FROM usertable WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $res = $stmt->get_result();
+    $email_check = "SELECT * FROM usertable WHERE email = '$email'";
+    $res = mysqli_query($con, $email_check);
     
     if (mysqli_num_rows($res) > 0) {
         $errors['email'] = "Email that you have entered already exists!";
@@ -67,9 +60,9 @@ if (isset($_POST['signup'])) {
         $code = rand(999999, 111111);
         $status = "notverified";
         
-        $stmt = $con->prepare("INSERT INTO usertable (name, email, phone, password, profile_picture, gender, terms_agreed, code, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssssiss", $name, $email, $phone, $encpass, $profile_picture, $gender, $terms_agreed, $code, $status);
-        $data_check = $stmt->execute();
+        $insert_data = "INSERT INTO usertable (name, email, phone, password, profile_picture, gender, terms_agreed, code, status)
+                        VALUES ('$name', '$email', '$phone', '$encpass', '$profile_picture', '$gender', '$terms_agreed', '$code', '$status')";
+        $data_check = mysqli_query($con, $insert_data);
         
         if ($data_check) {
             $subject = "Email Verification Code";
@@ -120,31 +113,40 @@ if (isset($_POST['signup'])) {
     }
 
     //if user click login button
-    if(isset($_POST['login'])){
+    if (isset($_POST['login'])) {
         $email = mysqli_real_escape_string($con, $_POST['email']);
         $password = mysqli_real_escape_string($con, $_POST['password']);
-        $check_email = "SELECT * FROM usertable WHERE email = '$email'";
-        $res = mysqli_query($con, $check_email);
-        if(mysqli_num_rows($res) > 0){
-            $fetch = mysqli_fetch_assoc($res);
+        
+        // Query to fetch user details including profile picture
+        $check_email = "SELECT * FROM usertable WHERE email = ?";
+        $stmt = $con->prepare($check_email);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $res = $stmt->get_result();
+    
+        if ($res->num_rows > 0) {
+            $fetch = $res->fetch_assoc();
             $fetch_pass = $fetch['password'];
-            if(password_verify($password, $fetch_pass)){
+    
+            if (password_verify($password, $fetch_pass)) {
                 $_SESSION['email'] = $email;
+                $_SESSION['profile_picture'] = $fetch['profile_picture'];
+                
                 $status = $fetch['status'];
-                if($status == 'verified'){
-                  $_SESSION['email'] = $email;
-                  $_SESSION['password'] = $password;
+                if ($status == 'verified') {
                     header('location: index.php');
-                }else{
-                    $info = "It's look like you haven't still verify your email - $email";
+                    exit();
+                } else {
+                    $info = "It looks like you haven't verified your email - $email";
                     $_SESSION['info'] = $info;
                     header('location: user-otp.php');
+                    exit();
                 }
-            }else{
-                $errors['email'] = "Incorrect email or password!";
+            } else {
+                $errors['login'] = "Incorrect email or password!";
             }
-        }else{
-            $errors['email'] = "It's look like you're not yet a member! Click on the bottom link to signup.";
+        } else {
+            $errors['login'] = "It looks like you're not yet a member! Click on the bottom link to signup.";
         }
     }
 

@@ -21,12 +21,6 @@
         </ul>
     </nav>
     <div class="form">
-    <div class="card-container">
-            <div class="card">
-                <h2>Welcome to HBS</h2>
-                <p>Register now to enjoy our exclusive services and offers!</p>
-            </div>
-        </div>
         <div class="container">
             <div class="title">Registration</div>
             <div class="content">
@@ -74,9 +68,13 @@
                             <input type="password" placeholder="Enter your password" id="password" name="password" required>
                         </div>
                         <div class="input-box">
-                            <span class="details">Upload Picture</span>
+                        <span class="details">Upload Picture</span>
+                        <label for="profile_picture" class="custom-file-upload">
+                            Choose Profile Picture
+                        </label>
                             <input type="file" name="profile_picture" id="profile_picture" required />
                         </div>
+                        
                     </div>
                     <div class="gender-details">
                         <span class="gender-title">Gender</span>
