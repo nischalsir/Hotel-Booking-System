@@ -33,7 +33,7 @@
               <span class="material-symbols-sharp">book </span>
               <h3>Bookings</h3>
            </a>
-           <a href="#">
+           <a href="admin-users.php">
               <span class="material-symbols-sharp">person_outline </span>
               <h3>Users</h3>
            </a>
@@ -62,7 +62,7 @@
               <span class="material-symbols-sharp">settings </span>
               <h3>Settings</h3>
            </a>
-           <a href="">
+           <a href="logout-admin.php">
               <span class="material-symbols-sharp">logout </span>
               <h3>Logout</h3>
            </a>
@@ -79,21 +79,66 @@
       --------------- -->
 
       <main>
-        <h1>Settings</h1>
+        <h2>Settings</h2>
 
         <div class="card">
-          <h2>Shut Down Website</h2>
-          <form id="shutdown-form" method="post">
+            <h2>Shut Down Website</h2>
             <div class="shutdown-container">
-              <p>Shutdown website for maintenance</p>
-              <label class="switch">
-                <input type="checkbox" name="shutdown" <?php echo (isset($shutdown_status) && $shutdown_status == 1) ? 'checked' : ''; ?>>
-                <span class="slider"></span>
-              </label>
+               <p>Shutdown website for maintenance</p>
+               <label class="switch">
+                     <input type="checkbox" id="shutdown" name="shutdown" <?php echo (isset($shutdown_status) && $shutdown_status == 1) ? 'checked' : ''; ?>>
+                     <span class="slider"></span>
+               </label>
             </div>
-          </form>
-          <div id="shutdown-notification" class="notification"></div>
+            <div id="shutdown-notification" class="notification"></div>
+         </div>
+
+
+
     </main>
+
+    <?php 
+$con = mysqli_connect('localhost', 'root', '', 'hotel_booking');
+
+if (!$con) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $shutdown = isset($data['shutdown_status']) ? (int)$data['shutdown_status'] : 0;
+
+    // Update the shutdown status in the database
+    $query = "UPDATE settings SET shutdown = ? WHERE sr_no = 1"; // Adjust the query as needed
+    $stmt = $con->prepare($query);
+    $stmt->bind_param("i", $shutdown);
+
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Shutdown status updated successfully.']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to update shutdown status.']);
+    }
+
+    $stmt->close();
+    $con->close();
+    exit;
+}
+
+// Fetch the current shutdown status from the database
+$query = "SELECT shutdown FROM settings WHERE sr_no = 1"; // Adjust the query as needed
+$result = $con->query($query);
+
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $shutdown_status = $row['shutdown'];
+} else {
+    $shutdown_status = 0; // Default value if no record found
+}
+
+$con->close();
+?>
+
+
 
           <!----------------
         start right main 
@@ -150,101 +195,45 @@
    </div>
   </div>
   </div>
+  <script>
+   document.addEventListener('DOMContentLoaded', function() {
+    const shutdownCheckbox = document.getElementById('shutdown');
+    const shutdownNotification = document.getElementById('shutdown-notification');
 
+    // Function to show notification
+    function showNotification(message) {
+        shutdownNotification.textContent = message;
+        shutdownNotification.classList.add('show');
+        setTimeout(() => shutdownNotification.classList.remove('show'), 3000);
+    }
 
-   <div class="sales-analytics">
-     <h2>Sales Analytics</h2>
+    // Handle checkbox change
+    shutdownCheckbox.addEventListener('change', function() {
+        const shutdownStatus = shutdownCheckbox.checked ? 1 : 0;
 
-      <div class="item onlion">
-        <div class="icon">
-          <span class="material-symbols-sharp">shopping_cart</span>
-        </div>
-        <div class="right_text">
-          <div class="info">
-            <h3>Onlion Orders</h3>
-            <small class="text-muted">Last seen 2 Hours</small>
-          </div>
-          <h5 class="danger">-17%</h5>
-          <h3>3849</h3>
-        </div>
-      </div>
-      <div class="item onlion">
-        <div class="icon">
-          <span class="material-symbols-sharp">shopping_cart</span>
-        </div>
-        <div class="right_text">
-          <div class="info">
-            <h3>Onlion Orders</h3>
-            <small class="text-muted">Last seen 2 Hours</small>
-          </div>
-          <h5 class="success">-17%</h5>
-          <h3>3849</h3>
-        </div>
-      </div>
-      <div class="item onlion">
-        <div class="icon">
-          <span class="material-symbols-sharp">shopping_cart</span>
-        </div>
-        <div class="right_text">
-          <div class="info">
-            <h3>Onlion Orders</h3>
-            <small class="text-muted">Last seen 2 Hours</small>
-          </div>
-          <h5 class="danger">-17%</h5>
-          <h3>3849</h3>
-        </div>
-      </div>
-   
-  
-
-</div>
-
-      <div class="item add_product">
-            <div>
-            <span class="material-symbols-sharp">add</span>
-            </div>
-     </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-      const shutdownForm = document.getElementById('shutdown-form');
-      const settingForm = document.getElementById('setting-form');
-      const shutdownNotification = document.getElementById('shutdown-notification');
-      const settingNotification = document.getElementById('setting-notification');
-
-      // Function to show notification
-      function showNotification(notificationElement, message) {
-          notificationElement.textContent = message;
-          notificationElement.classList.add('show');
-          setTimeout(() => notificationElement.classList.remove('show'), 3000);
-      }
-
-      // Handle shutdown form changes
-      shutdownForm.addEventListener('change', function() {
-          const formData = new FormData(shutdownForm);
-
-          fetch('', {
-              method: 'POST',
-              body: formData
-          })
-          .then(response => response.json())
-          .then(data => {
-              if (data.success) {
-                  showNotification(shutdownNotification, data.message);
-              } else {
-                  showNotification(shutdownNotification, 'Error: ' + data.message);
-              }
-          })
-          .catch(error => {
-              console.error('Error:', error);
-              showNotification(shutdownNotification, 'Error: Unable to update shutdown status');
-          });
-      });
+        fetch('/admin/admin-settings.php', {  // Update this URL if needed
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ shutdown_status: shutdownStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message);
+            } else {
+                showNotification('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error: Unable to update shutdown status');
+        });
     });
+});
 
-   </script>
-
+  </script>
    <script src="./js/script.js"></script>
 </body>
 </html>

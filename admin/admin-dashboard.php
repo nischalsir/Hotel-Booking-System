@@ -33,7 +33,7 @@
               <span class="material-symbols-sharp">book </span>
               <h3>Bookings</h3>
            </a>
-           <a href="#">
+           <a href="admin-users.php">
               <span class="material-symbols-sharp">person_outline </span>
               <h3>Users</h3>
            </a>

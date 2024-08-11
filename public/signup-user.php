@@ -1,3 +1,4 @@
+<?php require_once "../config/controllerUserData.php"; ?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -27,37 +28,62 @@
           <p>Book Hotels and stay packages at lowest price.</p>
         </div>
         <div class="booking">
-          <form>
-            <div class="form-group">
-              <div class="input-group">
-                <input type="text" required />
-                <label>Name</label>
-              </div>
-              <p>Please enter your name</p>
-            </div>
-            <div class="form-group">
-              <div class="input-group">
-                <input type="email" required />
-                <label>Email</label>
-              </div>
-              <p>Enter email</p>
-            </div>
-            <div class="form-group">
-              <div class="input-group">
-                <input type-="number" required />
-                <label>Phone</label>
-              </div>
-              <p>Enter your contact number</p>
-            </div>
-            <div class="form-group">
-              <div class="input-group">
-                <input type="password" required />
-                <label>Password</label>
-              </div>
-              <p>Enter password</p>
-            </div>
-          </form>
-          <button class="btn">Sign Up</button>
+        <?php
+                    if(count($errors) == 1){
+                        ?>
+                        <div class="alert alert-danger text-center">
+                            <?php
+                            foreach($errors as $showerror){
+                                echo $showerror;
+                            }
+                            ?>
+                        </div>
+                        <?php
+                    }elseif(count($errors) > 1){
+                        ?>
+                        <div class="alert alert-danger">
+                            <?php
+                            foreach($errors as $showerror){
+                                ?>
+                                <li><?php echo $showerror; ?></li>
+                                <?php
+                            }
+                            ?>
+                        </div>
+                        <?php
+                    }
+                    ?>
+              <form action="signup-user.php" method="POST" autocomplete="">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="text" name="name" required />
+                        <label>Name</label>
+                    </div>
+                    <p>Please enter your name</p>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="email" name="email" required />
+                        <label>Email</label>
+                    </div>
+                    <p>Enter your email</p>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="number" name="phone" required />
+                        <label>Phone</label>
+                    </div>
+                    <p>Enter your contact number</p>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="password" name="password" required />
+                        <label>Password</label>
+                    </div>
+                    <p>Enter password</p>
+                </div>
+                <button class="btn" type="submit" name="signup">Sign Up</button>
+            </form>
           <p>Already have an account? <a href="login-user.php">Login</a></p>
         </div>        
       </div>

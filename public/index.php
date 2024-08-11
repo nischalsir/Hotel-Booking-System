@@ -8,7 +8,7 @@
       rel="stylesheet">
     <link rel="stylesheet" href="css/index.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <title>HBS - Home</title>
+    <title>Hotel Booking System</title>
   </head>
   <body>
     <nav>
@@ -205,7 +205,7 @@
       <div class="reward-content">
         <p>100+ discount codes</p>
         <h4>Register and discover amazing discounts on your booking.</h4>
-        <a href="login-user.php"><button class="btn">Register</button></a>
+        <a href="signup-user.php"><button class="btn">Register</button></a>
       </div>
     </section>
 

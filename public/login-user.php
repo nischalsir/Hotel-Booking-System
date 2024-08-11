@@ -1,3 +1,4 @@
+<?php require_once "../config/controllerUserData.php"; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,23 +25,32 @@
         <p>Welcome back! Log in to your account.</p>
       </div>
       <div class="booking">
-        <form>
+          <?php
+          if(count($errors) > 0){
+              echo '<div class="alert alert-danger text-center">';
+              foreach($errors as $showerror){
+                  echo $showerror . '<br>';
+              }
+              echo '</div>';
+          }
+          ?>
+        <form action="login-user.php" method="post" autocomplete="">
         <div class="form-group">
             <div class="input-group">
-              <input type="email" required>
+              <input type="email" name="email" required value="<?php echo $email ?>">
               <label>Email</label>
             </div>
             <p>Enter your email</p>
           </div>
           <div class="form-group">
             <div class="input-group">
-              <input type="password" required>
+              <input type="password" name="password" id="pass" required>
               <label>Password</label>
             </div>
             <p>Enter your password</p>
           </div>
+          <button class="btn" type="submit" name="login" value="Login">Log In</button>
         </form>
-        <button class="btn">Sign In</button>
         <p>Don't have an account? <a href="signup-user.php">Sign Up</a></p>
       </div>
     </div>

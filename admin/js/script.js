@@ -37,3 +37,4 @@ document.addEventListener('DOMContentLoaded', function() {
     showNotification('New update has been added!');
 });
 
+
