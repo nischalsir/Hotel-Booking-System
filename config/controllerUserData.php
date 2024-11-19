@@ -27,7 +27,7 @@ if (isset($_POST['signup'])) {
         $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif');
         if (in_array($fileExtension, $allowedExtensions)) {
             $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
-            $uploadFileDir = './uploads/';
+            $uploadFileDir = 'uploads/';
             $dest_path = $uploadFileDir . $newFileName;
 
             if (move_uploaded_file($fileTmpPath, $dest_path)) {
@@ -113,42 +113,43 @@ if (isset($_POST['signup'])) {
     }
 
     //if user click login button
-    if (isset($_POST['login'])) {
-        $email = mysqli_real_escape_string($con, $_POST['email']);
-        $password = mysqli_real_escape_string($con, $_POST['password']);
-        
-        // Query to fetch user details including profile picture
-        $check_email = "SELECT * FROM usertable WHERE email = ?";
-        $stmt = $con->prepare($check_email);
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $res = $stmt->get_result();
+if (isset($_POST['login'])) {
+    $email = mysqli_real_escape_string($con, $_POST['email']);
+    $password = mysqli_real_escape_string($con, $_POST['password']);
     
-        if ($res->num_rows > 0) {
-            $fetch = $res->fetch_assoc();
-            $fetch_pass = $fetch['password'];
-    
-            if (password_verify($password, $fetch_pass)) {
-                $_SESSION['email'] = $email;
-                $_SESSION['profile_picture'] = $fetch['profile_picture'];
-                
-                $status = $fetch['status'];
-                if ($status == 'verified') {
-                    header('location: index.php');
-                    exit();
-                } else {
-                    $info = "It looks like you haven't verified your email - $email";
-                    $_SESSION['info'] = $info;
-                    header('location: user-otp.php');
-                    exit();
-                }
+    // Query to fetch user details including profile picture
+    $check_email = "SELECT * FROM usertable WHERE email = ?";
+    $stmt = $con->prepare($check_email);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $res = $stmt->get_result();
+
+    if ($res->num_rows > 0) {
+        $fetch = $res->fetch_assoc();
+        $fetch_pass = $fetch['password'];
+
+        if (password_verify($password, $fetch_pass)) {
+            $_SESSION['email'] = $email;
+            $_SESSION['profile_picture'] = $fetch['profile_picture'];
+            
+            $status = $fetch['status'];
+            if ($status == 'verified') {
+                header('location: index.php');
+                exit();
             } else {
-                $errors['login'] = "Incorrect email or password!";
+                $info = "It looks like you haven't verified your email - $email";
+                $_SESSION['info'] = $info;
+                header('location: user-otp.php');
+                exit();
             }
         } else {
-            $errors['login'] = "It looks like you're not yet a member! Click on the bottom link to signup.";
+            $errors['login'] = "Incorrect email or password!";
         }
+    } else {
+        $errors['login'] = "It looks like you're not yet a member! Click on the bottom link to signup.";
     }
+}
+
 
     //if user click continue button in forgot password form
     if(isset($_POST['check-email'])){

@@ -8,10 +8,12 @@ if($_SESSION['info'] == false){
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login Form</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/form.css">
+    <meta charset="UTF-8">
+    <title>Password changed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
 <nav>
@@ -24,30 +26,35 @@ if($_SESSION['info'] == false){
             <li class="nav-link"><a href="about.php">About</a></li>
             </ul>
     </nav>
-    <div class="form">
-        <div class="container">
-          <div class="title">Password Changed Sucessfully</div>
-          <div class="content">
-            <br>
-            <?php 
-            if(isset($_SESSION['info'])){
+    <section class="bg-gray-50 min-h-screen flex items-center justify-center">
+        <!-- Create New Password Container -->
+        <div class="bg-gray-100 flex rounded-2xl shadow-lg max-w-lg p-8 w-full">
+            <!-- Form -->
+            <div class="w-full">
+                <h2 class="font-bold text-2xl text-[#002D74]">Password Changed Successfully!</h2>
+                <p class="text-xs mt-4 text-[#002D74]"></p>
+
+                <?php 
+                if(isset($_SESSION['info'])){
+                    ?>
+                    <div class="alert alert-success text-center">
+                    <?php echo $_SESSION['info']; ?>
+                    </div>
+                    <?php
+                }
                 ?>
-                <div class="alert alert-success text-center">
-                <?php echo $_SESSION['info']; ?>
-                </div>
-                <?php
-            }
-            ?>
-             <form action="login-user.php" method="POST">
-              <div class="button">
-                        <input class="form-control button" type="submit" name="login-now" value="Login Now">
-              </div>
-            </form>
-          </div>
+                
+                <!-- Password Form -->
+                <form action="login-user.php" method="POST" class="flex flex-col gap-6">
+                    <button class="bg-[#002D74] rounded-xl text-white py-3 hover:scale-105 duration-300 mt-4 w-full" type="submit" name="login-now" value="Login Now">LogIn</button>
+                </form>
+            </div>
         </div>
-      </div>
+    </section>
 
     <?php include "./include/footer.php"; ?>
     
 </body>
 </html>
+<body>
+

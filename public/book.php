@@ -1,255 +1,176 @@
+<?php
+// Include the database connection
+include('../config/connection.php');
+
+// Start session to access logged-in user data
+session_start();
+
+// Initialize variables
+$availableRooms = [];
+$message = "";
+
+// Retrieve all available rooms
+$sql = "
+    SELECT * FROM rooms 
+    WHERE availability = 1 
+    AND id NOT IN (
+        SELECT room_id FROM bookings 
+        WHERE 
+            (check_in_date <= CURDATE() AND check_out_date >= CURDATE())
+    )";
+$stmt = $con->prepare($sql);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Fetch available rooms
+while ($row = $result->fetch_assoc()) {
+    $availableRooms[] = $row;
+}
+$stmt->close();
+
+// Handle room booking
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_now'])) {
+    // Booking data from the form
+    $userId = $_SESSION['user_id'] ?? null; // Retrieve the logged-in user ID from session
+    $roomId = $_POST['room_id'];
+    $checkIn = $_POST['check_in'];
+    $checkOut = $_POST['check_out'];
+    $guests = $_POST['guests'];
+
+    // Validate input data
+    if (!$userId) {
+        $message = "You must be logged in to make a booking.";
+    } elseif (empty($roomId) || empty($checkIn) || empty($checkOut) || empty($guests)) {
+        $message = "Please fill in all the required fields.";
+    } elseif ($checkIn >= $checkOut) {
+        $message = "Check-out date must be later than check-in date.";
+    } else {
+        // Check for room availability in the given date range
+        $sql = "
+            SELECT * FROM bookings 
+            WHERE room_id = ? 
+            AND status = 'Pending'
+            AND (
+                (check_in_date <= ? AND check_out_date > ?) OR
+                (check_in_date < ? AND check_out_date >= ?)
+            )";
+        $stmt = $con->prepare($sql);
+        $stmt->bind_param("issss", $roomId, $checkOut, $checkIn, $checkOut, $checkIn);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $message = "The selected room is not available for the chosen dates.";
+        } else {
+            // Insert booking into the bookings table
+            $sql = "INSERT INTO bookings (user_id, room_id, check_in_date, check_out_date, booking_date, guests, status) 
+                    VALUES (?, ?, ?, ?, CURDATE(), ?, 'Pending')";
+            $stmt = $con->prepare($sql);
+            $stmt->bind_param("iissi", $userId, $roomId, $checkIn, $checkOut, $guests);
+
+            if ($stmt->execute()) {
+                $message = "Booking successful! Please make a payment at the hotel and bring a valid ID.";
+                echo "<script>
+                        alert('$message');
+                        window.location.href = 'profile.php';
+                    </script>";
+            } else {
+                $message = "Booking failed. Please try again later.";
+            }
+            $stmt->close();
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link
-      href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css"
-      rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="css/index.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <title>HBS - Rooms</title>
-  </head>
-  <body>
-    <nav>
-      <div class="logo">HBS</div>
-      <ul class="nav-links">
-        <li class="nav-link"><a href="index.php">Home</a></li>
-        <li class="nav-link"><a href="book.php">Rooms</a></li>
-        <li class="nav-link"><a href="facilities.php">Facilities</a></li>
-        <li class="nav-link"><a href="contact.php">Contact</a></li>
-        <li class="nav-link"><a href="about.php">About</a></li>
-        <a href="login-user.php"><button class="btn">Sign In</button></a>
-      </ul>
-    </nav>
+</head>
+<body>
+    <?php include('./include/header.php'); ?>
+
     <header class="header">
-  <div class="header-img">
-    <div class="header-content">
-      <h1>Check Availability</h1>
-      <p>Book Hotels and stay packages at the lowest price.</p>
-    </div>
-    <div class="booking">
-      <form>
-        <div class="form-group">
-          <select id="room-type" name="room-type" required>
-            <option value="" disabled selected>Select your room type</option>
-            <option value="deluxe-room">Deluxe Room</option>
-            <option value="luxury-room">Luxury Room</option>
-            <option value="suite-room">Suite Room</option>
-            <option value="presidential-suite">Presidential Suite</option>
-            <option value="executive-room">Executive Room</option>
-            <option value="standard-room">Standard Room</option>
-          </select>
-          <p>Select your room type</p>
+        <div class="header-img">
+            <div class="header-content">
+                <h1>Available Rooms</h1>
+                <p>Choose a room and book your stay at the best price.</p>
+            </div>
         </div>
-        <div class="form-group">
-          <div class="input-group">
-            <input type="date" required />
-          </div>
-          <p>Check In</p>
-        </div>
-        <div class="form-group">
-          <div class="input-group">
-            <input type="date" required />
-          </div>
-          <p>Check Out</p>
-        </div>
-        <div class="form-group">
-          <div class="input-group">
-            <input type="number" required />
-          </div>
-          <p>Add guests</p>
-        </div>
-      </form>
-    </div>
-  </div>
-</header>
+    </header>
 
-<section class="section">
-  <h2 class="section-title">Popular Rooms</h2>
-  <div class="grid">
+    <section class="section">
+        <h2 class="section-title">Available Rooms</h2>
+        <div class="grid">
+            <?php
+            if (!empty($message)) {
+                echo "<div class='message'>$message</div>"; // Display message
+            }
+            if (!empty($availableRooms)) {
+                // Display rooms based on availability
+                foreach ($availableRooms as $room) {
+                    echo "
+                        <div class='card'>
+                            <img src='{$room['image']}' alt='{$room['room_type']}' />
+                            <div class='card-content'>
+                                <div class='card-header'>
+                                    <h4>{$room['room_type']}</h4>
+                                    <h4>रु {$room['price']}</h4>
+                                </div>
+                                <div class='features'>
+                                    <span class='feature'>{$room['description']}</span>
+                                </div>
+                            </div>
+                        </div>
+                    ";
+                }
+            } else {
+                echo "<p>No rooms available.</p>";
+            }
+            ?>
+        </div>
 
-    <div class="card">
-      <img src="images/deluxe-room.jpeg" alt="Deluxe Room" />
-      <div class="card-content">
-        <div class="card-header">
-          <h4>Deluxe Room</h4>
-          <h4>रु 2,500</h4>
-        </div>
-        <div class="features">
-          <span class="feature">2 Beds</span>
-          <span class="feature">Free Wi-Fi</span>
-          <span class="feature">Breakfast Included</span>
-        </div>
-        <div class="feature">
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bx-star' style='color:#ffe200'></i>
-        </div>
-        <a href="rooms.php" class="btn book-now">Book Now</a>
-      </div>
-    </div>
+        <?php if (!empty($availableRooms)) { ?>
+        <!-- Booking form -->
+        <h2 class="form-title">Book Your Room</h2>
+        
+        <form method="POST" action="" class="mt-6">
+            <div class="grid gap-6 mb-6 md:grid-cols-2">
+                <div>
+                    <label for="room_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Room</label>
+                    <select name="room_id" id="room_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                        <option value="" disabled selected>Select a room</option>
+                        <?php foreach ($availableRooms as $room) { ?>
+                            <option value="<?php echo $room['id']; ?>"><?php echo $room['room_type']; ?> - रु <?php echo $room['price']; ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+                <div>
+                    <label for="check_in" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Check In</label>
+                    <input type="date" name="check_in" id="check_in" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                </div>
+                <div>
+                    <label for="check_out" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Check Out</label>
+                    <input type="date" name="check_out" id="check_out" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                </div>
+                <div>
+                    <label for="guests" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Guests</label>
+                    <input type="number" name="guests" id="guests" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Number of guests" required />
+                </div>
+            </div>
+            <button type="submit" name="book_now" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Book Now</button>
+        </form>
+        </form>
+        <?php } ?>
+    </section>
 
-    <div class="card">
-      <img src="images/luxury-room.jpeg" alt="Luxury Room" />
-      <div class="card-content">
-        <div class="card-header">
-          <h4>Luxury Room</h4>
-          <h4>रु 6,000</h4>
-        </div>
-        <div class="features">
-          <span class="feature">1 King Bed</span>
-          <span class="feature">Free Wi-Fi</span>
-          <span class="feature">Mini Bar</span>
-        </div>
-        <div class="feature">
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-        </div>
-        <a href="rooms.php" class="btn book-now">Book Now</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <img src="images/suite-room.jpeg" alt="Suite Room" />
-      <div class="card-content">
-        <div class="card-header">
-          <h4>Suite Room</h4>
-          <h4>रु 7,500</h4>
-        </div>
-        <div class="features">
-          <span class="feature">2 Beds</span>
-          <span class="feature">Free Wi-Fi</span>
-          <span class="feature">Living Area</span>
-        </div>
-        <div class="feature">
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star-half' style='color:#ffe200'></i>
-        </div>
-        <a href="rooms.php" class="btn book-now">Book Now</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <img src="images/presidential-suite.jpeg" alt="Presidential Suite" />
-      <div class="card-content">
-        <div class="card-header">
-          <h4>Presidential Suite</h4>
-          <h4>रु 12,000</h4>
-        </div>
-        <div class="features">
-          <span class="feature">3 Beds</span>
-          <span class="feature">Free Wi-Fi</span>
-          <span class="feature">Swimming Pool</span>
-          <span class="feature">Private Balcony</span>
-        </div>
-        <div class="feature">
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-        </div>
-        <a href="rooms.php" class="btn book-now">Book Now</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <img src="images/executive-room.jpeg" alt="Executive Room" />
-      <div class="card-content">
-        <div class="card-header">
-          <h4>Executive Room</h4>
-          <h4>रु 8,000</h4>
-        </div>
-        <div class="features">
-          <span class="feature">1 King Bed</span>
-          <span class="feature">Free Wi-Fi</span>
-          <span class="feature">Executive Desk</span>
-        </div>
-        <div class="feature">
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bx-star' style='color:#ffe200'></i>
-        </div>
-        <a href="rooms.php" class="btn book-now">Book Now</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <img src="images/standard-room.jpeg" alt="Standard Room" />
-      <div class="card-content">
-        <div class="card-header">
-          <h4>Standard Room</h4>
-          <h4>रु 4,000</h4>
-        </div>
-        <div class="features">
-          <span class="feature">1 Bed</span>
-          <span class="feature">Free Wi-Fi</span>
-          <span class="feature">Basic Amenities</span>
-        </div>
-        <div class="feature">
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star' style='color:#ffe200'></i>
-          <i class='bx bxs-star-half' style='color:#ffe200'></i>
-          <i class='bx bx-star' style='color:#ffe200'></i>
-        </div>
-        <a href="rooms.php" class="btn book-now">Book Now</a>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-
-    <footer class="footer">
-      <div class="section">
-        <div class="footer-col">
-          <h3>HBS</h3>
-          <p>
-            HBS is a premier hotel booking website that offers a seamless and
-            convenient way to find and book accommodations worldwide.
-          </p>
-          <p>
-            With a user-friendly interface and a vast selection of hotels,
-            HBS aims to provide a stress-free experience for travelers
-            seeking the perfect stay.
-          </p>
-        </div>
-        <div class="footer-col">
-          <h4>Company</h4>
-          <p>About Us</p>
-          <p>Our Team</p>
-          <p>Blog</p>
-          <p>Book</p>
-          <p>Contact Us</p>
-        </div>
-        <div class="footer-col">
-          <h4>Legal</h4>
-          <p>FAQs</p>
-          <p>Terms & Conditions</p>
-          <p>Privacy Policy</p>
-        </div>
-        <div class="footer-col">
-          <h4>Resources</h4>
-          <p>Social Media</p>
-          <p>Help Center</p>
-          <p>Partnerships</p>
-        </div>
-      </div>
-      <div class="footer-bar">
-        Copyright © 2023 Hotel Booking System. All rights reserved.
-      </div>
-    </footer>
-  </body>
+    <?php include "include/footer.php"; ?>
+</body>
 </html>
