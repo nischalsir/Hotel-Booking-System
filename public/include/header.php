@@ -1,7 +1,21 @@
 <?php
+$con = mysqli_connect('localhost', 'root', '', 'hotel_booking');
+// Start session and check login status
 session_start();
-// Check if user is logged in
 $is_logged_in = isset($_SESSION['email']);
+$profile_pic_path = 'uploads/default_profile_picture.png';  // Default image if not set
+
+if ($is_logged_in) {
+    // Get the user's profile picture from the database
+    $email = $_SESSION['email'];  // User's email stored in session
+    $query = "SELECT profile_picture FROM usertable WHERE email = '$email' LIMIT 1";
+    $result = mysqli_query($con, $query);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $user_data = mysqli_fetch_assoc($result);
+        $profile_pic_path = $user_data['profile_picture'];  // Retrieve the profile picture path
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -34,17 +48,16 @@ $is_logged_in = isset($_SESSION['email']);
 
             <!-- User Info Section -->
             <?php if ($is_logged_in): ?>
-                <?php 
-                // Fetch profile picture path from session
-                $profile_picture = isset($_SESSION['profile_picture']) ? $_SESSION['profile_picture'] : '';
-                
-                // Ensure profile picture path is correctly set
-                $profile_pic_path = !empty($profile_picture) ? htmlspecialchars($profile_picture) : 'uploads/default_profile_picture.png';
-                ?>
-                <img src="<?php echo $profile_pic_path; ?>" alt="Profile Picture" class="profile-pic" />
-                <a href="logout.php"><button class="btn">Logout</button></a>
+                <li class="nav-link">
+                    <img src="<?php echo htmlspecialchars($profile_pic_path); ?>" alt="Profile Picture" class="profile-pic" />
+                </li>
+                <li class="nav-link">
+                    <a href="logout.php"><button class="btn">Logout</button></a>
+                </li>
             <?php else: ?>
-                <a href="login-user.php"><button class="btn">Sign In</button></a>
+                <li class="nav-link">
+                    <a href="login-user.php"><button class="btn">Sign In</button></a>
+                </li>
             <?php endif; ?>
         </ul>
     </nav>

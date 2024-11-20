@@ -5,115 +5,138 @@ $email = "";
 $name = "";
 $errors = array();
 
-// If user signup button is clicked
-if (isset($_POST['signup'])) {
-    $name = mysqli_real_escape_string($con, $_POST['name']);
-    $email = mysqli_real_escape_string($con, $_POST['email']);
-    $phone = mysqli_real_escape_string($con, $_POST['phone']);
-    $password = mysqli_real_escape_string($con, $_POST['password']);
-    $gender = mysqli_real_escape_string($con, $_POST['gender']);
-    $terms_agreed = isset($_POST['terms']) ? 1 : 0;
+    // If user signup button is clicked
+    if (isset($_POST['signup'])) {
+        $name = mysqli_real_escape_string($con, $_POST['name']);
+        $email = mysqli_real_escape_string($con, $_POST['email']);
+        $phone = mysqli_real_escape_string($con, $_POST['phone']);
+        $password = mysqli_real_escape_string($con, $_POST['password']);
+        $gender = mysqli_real_escape_string($con, $_POST['gender']);
+        $terms_agreed = isset($_POST['terms']) ? 1 : 0;
 
-    // Handle profile picture upload
-    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['profile_picture']['tmp_name'];
-        $fileName = $_FILES['profile_picture']['name'];
-        $fileSize = $_FILES['profile_picture']['size'];
-        $fileType = $_FILES['profile_picture']['type'];
-        $fileNameCmps = explode(".", $fileName);
-        $fileExtension = strtolower(end($fileNameCmps));
-        
-        // Validate file extension
-        $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif');
-        if (in_array($fileExtension, $allowedExtensions)) {
-            $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
-            $uploadFileDir = 'uploads/';
-            $dest_path = $uploadFileDir . $newFileName;
+        // Password validation
+        if (!preg_match('/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/', $password)) {
+            $errors['password'] = "Password must be between 8-16 characters, include at least one letter, one number, and one special character.";
+        }
 
-            if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                $profile_picture = $dest_path;
+        // Password shouldn't contain the name
+        if (strpos(strtolower($password), strtolower($name)) !== false) {
+            $errors['password'] = "Password should not contain your name.";
+        }
+
+        // Handle profile picture upload
+        if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+            $fileTmpPath = $_FILES['profile_picture']['tmp_name'];
+            $fileName = $_FILES['profile_picture']['name'];
+            $fileSize = $_FILES['profile_picture']['size'];
+            $fileType = $_FILES['profile_picture']['type'];
+            $fileNameCmps = explode(".", $fileName);
+            $fileExtension = strtolower(end($fileNameCmps));
+
+            // Validate file extension
+            $allowedExtensions = array('jpg', 'jpeg', 'png', 'gif');
+            if (in_array($fileExtension, $allowedExtensions)) {
+                $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+                $uploadFileDir = 'uploads/';
+                $dest_path = $uploadFileDir . $newFileName;
+
+                if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                    $profile_picture = $dest_path;
+                } else {
+                    $errors['profile_picture'] = "There was an error moving the uploaded file.";
+                }
             } else {
-                $errors['profile_picture'] = "There was an error moving the uploaded file.";
+                $errors['profile_picture'] = "Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.";
             }
         } else {
-            $errors['profile_picture'] = "Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.";
+            $errors['profile_picture'] = "Please upload a valid profile picture.";
         }
-    } else {
-        $errors['profile_picture'] = "Please upload a valid profile picture.";
-    }
 
-    // Check if email already exists
-    $email_check = "SELECT * FROM usertable WHERE email = '$email'";
-    $res = mysqli_query($con, $email_check);
-    
-    if (mysqli_num_rows($res) > 0) {
-        $errors['email'] = "Email that you have entered already exists!";
-    }
-
-    // Check if terms and conditions are agreed to
-    if ($terms_agreed !== 1) {
-        $errors['terms'] = "You must agree to the terms and conditions!";
-    }
-
-    if (count($errors) === 0) {
-        $encpass = password_hash($password, PASSWORD_BCRYPT);
-        $code = rand(999999, 111111);
-        $status = "notverified";
+        // Check if email already exists
+        $email_check = "SELECT * FROM usertable WHERE email = '$email'";
+        $res = mysqli_query($con, $email_check);
         
-        $insert_data = "INSERT INTO usertable (name, email, phone, password, profile_picture, gender, terms_agreed, code, status)
-                        VALUES ('$name', '$email', '$phone', '$encpass', '$profile_picture', '$gender', '$terms_agreed', '$code', '$status')";
-        $data_check = mysqli_query($con, $insert_data);
-        
-        if ($data_check) {
-            $subject = "Email Verification Code";
-            $message = "Your verification code is $code";
-            $sender = "From: Hotel Booking System";
+        if (mysqli_num_rows($res) > 0) {
+            $errors['email'] = "Email that you have entered already exists!";
+        }
 
-            if (mail($email, $subject, $message, $sender)) {
-                $info = "We've sent a verification code to your email - $email";
-                $_SESSION['info'] = $info;
-                $_SESSION['email'] = $email;
-                $_SESSION['password'] = $password;
-                header('location: user-otp.php');
-                exit();
+        // Check if terms and conditions are agreed to
+        if ($terms_agreed !== 1) {
+            $errors['terms'] = "You must agree to the terms and conditions!";
+        }
+
+        // If no errors, proceed to insert the data
+        if (count($errors) === 0) {
+            $encpass = password_hash($password, PASSWORD_BCRYPT);
+            $code = rand(999999, 111111);
+            $status = "notverified";
+
+            $insert_data = "INSERT INTO usertable (name, email, phone, password, profile_picture, gender, terms_agreed, code, status)
+                            VALUES ('$name', '$email', '$phone', '$encpass', '$profile_picture', '$gender', '$terms_agreed', '$code', '$status')";
+            $data_check = mysqli_query($con, $insert_data);
+
+            if ($data_check) {
+                $subject = "Email Verification Code";
+                $message = "Your verification code is $code";
+                $sender = "From: Hotel Booking System";
+
+                if (mail($email, $subject, $message, $sender)) {
+                    $info = "We've sent a verification code to your email - $email";
+                    $_SESSION['info'] = $info;
+                    $_SESSION['email'] = $email;
+                    $_SESSION['password'] = $password;
+                    header('location: user-otp.php');
+                    exit();
+                } else {
+                    $errors['otp-error'] = "Failed while sending code!";
+                }
             } else {
-                $errors['otp-error'] = "Failed while sending code!";
+                $errors['db-error'] = "Failed while inserting data into database!";
             }
-        } else {
-            $errors['db-error'] = "Failed while inserting data into database!";
         }
     }
-}
 
-    //if user click verification code submit button
-    if(isset($_POST['check'])){
+    // If user clicks the verification code submit button
+    if (isset($_POST['check'])) {
         $_SESSION['info'] = "";
-        $otp_code = mysqli_real_escape_string($con, $_POST['otp']);
-        $check_code = "SELECT * FROM usertable WHERE code = $otp_code";
+        
+        // Combine the OTP array into a single string
+        $otp_array = $_POST['otp']; // This is an array
+        $otp_code = implode('', $otp_array); // Combine array values into a single string
+        
+        // Escape the combined OTP string
+        $otp_code = mysqli_real_escape_string($con, $otp_code);
+        
+        // Query to check the code in the database
+        $check_code = "SELECT * FROM usertable WHERE code = '$otp_code'";
         $code_res = mysqli_query($con, $check_code);
-        if(mysqli_num_rows($code_res) > 0){
+        
+        if (mysqli_num_rows($code_res) > 0) {
             $fetch_data = mysqli_fetch_assoc($code_res);
             $fetch_code = $fetch_data['code'];
             $email = $fetch_data['email'];
-            $code = 0;
+            $code = 0; // Reset the code
             $status = 'verified';
-            $update_otp = "UPDATE usertable SET code = $code, status = '$status' WHERE code = $fetch_code";
+            
+            // Update the code and status in the database
+            $update_otp = "UPDATE usertable SET code = $code, status = '$status' WHERE code = '$fetch_code'";
             $update_res = mysqli_query($con, $update_otp);
-            if($update_res){
-                $_SESSION['name'] = $name;
+            
+            if ($update_res) {
+                $_SESSION['name'] = $fetch_data['name'];
                 $_SESSION['email'] = $email;
                 header('location: index.php');
                 exit();
-            }else{
+            } else {
                 $errors['otp-error'] = "Failed while updating code!";
             }
-        }else{
-            $errors['otp-error'] = "You've entered incorrect code!";
+        } else {
+            $errors['otp-error'] = "You've entered an incorrect code!";
         }
     }
 
     //if user click login button
-if (isset($_POST['login'])) {
+    if (isset($_POST['login'])) {
     $email = mysqli_real_escape_string($con, $_POST['email']);
     $password = mysqli_real_escape_string($con, $_POST['password']);
     
@@ -163,7 +186,7 @@ if (isset($_POST['login'])) {
             if($run_query){
                 $subject = "Password Reset Code";
                 $message = "Your password reset code is $code";
-                $sender = "From: nischalpandey2002@gmail.com";
+                $sender = "From: Hotel Booking System";
                 if(mail($email, $subject, $message, $sender)){
                     $info = "We've sent a password reset otp to your email - $email";
                     $_SESSION['info'] = $info;
@@ -181,22 +204,39 @@ if (isset($_POST['login'])) {
         }
     }
 
-    //if user click check reset otp button
-    if(isset($_POST['check-reset-otp'])){
+    // If user clicks the check-reset-otp button
+    if (isset($_POST['check-reset-otp'])) {
         $_SESSION['info'] = "";
-        $otp_code = mysqli_real_escape_string($con, $_POST['otp']);
-        $check_code = "SELECT * FROM usertable WHERE code = $otp_code";
-        $code_res = mysqli_query($con, $check_code);
-        if(mysqli_num_rows($code_res) > 0){
-            $fetch_data = mysqli_fetch_assoc($code_res);
-            $email = $fetch_data['email'];
-            $_SESSION['email'] = $email;
-            $info = "Please create a new password that you don't use on any other site.";
-            $_SESSION['info'] = $info;
-            header('location: new-password.php');
-            exit();
-        }else{
-            $errors['otp-error'] = "You've entered incorrect code!";
+
+        // Combine OTP array into a single string
+        if (isset($_POST['otp']) && is_array($_POST['otp'])) {
+            $otp_code = implode('', $_POST['otp']); // Combine the array into "123456"
+        } else {
+            $otp_code = ''; // Default to empty string if not set or invalid
+        }
+
+        // Validate the OTP format (e.g., ensure it's exactly 6 digits)
+        if (!preg_match('/^\d{6}$/', $otp_code)) {
+            $errors['otp-error'] = "Invalid OTP format. Please enter a 6-digit code.";
+        } else {
+            // Escape the combined OTP string for database use
+            $otp_code = mysqli_real_escape_string($con, $otp_code);
+
+            // Query the database to check the OTP
+            $check_code = "SELECT * FROM usertable WHERE code = '$otp_code'";
+            $code_res = mysqli_query($con, $check_code);
+
+            if (mysqli_num_rows($code_res) > 0) {
+                $fetch_data = mysqli_fetch_assoc($code_res);
+                $email = $fetch_data['email'];
+                $_SESSION['email'] = $email;
+                $info = "Please create a new password that you don't use on any other site.";
+                $_SESSION['info'] = $info;
+                header('Location: new-password.php');
+                exit();
+            } else {
+                $errors['otp-error'] = "You've entered an incorrect code!";
+            }
         }
     }
 
