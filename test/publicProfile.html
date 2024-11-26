@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">xPay</div>
+      <nav>
+        <ul>
+          <li class="active">My Dashboard</li>
+          <li>Accounts</li>
+          <li>Mobile</li>
+          <li>Payments</li>
+          <li>Complaints</li>
+          <li>Support</li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main>
+      <header class="header">
+        <h1>Welcome to xPay Payment Portal</h1>
+        <div class="user-info">
+          <span>Hello, Sami</span>
+          <img src="user-photo.jpg" alt="User Photo" class="user-avatar">
+        </div>
+      </header>
+
+      <section class="content">
+        <!-- Profile Section -->
+        <div class="profile">
+          <h2>My Profile</h2>
+          <div class="profile-info">
+            <img src="profile-pic.jpg" alt="Profile Picture" class="profile-pic">
+            <div>
+              <p class="profile-name">Sami Rahman</p>
+              <p class="profile-contact">+1-555-669-1236</p>
+              <p class="profile-email">SamiRahman002@gmail.com</p>
+              <div class="sms-toggle">
+                <label>
+                  SMS Alerts Activation:
+                  <input type="checkbox" checked>
+                </label>
+              </div>
+              <button class="save-btn">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account and Bills Section -->
+        <div class="cards">
+          <div class="card account-card">
+            <h2>My xPay Accounts</h2>
+            <div class="account-info">
+              <p><strong>Active Account:</strong> 8645 8620 9084 425</p>
+              <button class="btn block-btn">Block Account</button>
+              <p><strong>Blocked Account:</strong> None</p>
+              <button class="btn unblock-btn">Unblock Account</button>
+            </div>
+          </div>
+
+          <div class="card bills-card">
+            <h2>My Bills</h2>
+            <ul>
+              <li>Phone Bill: <span class="status paid">Bill Paid</span></li>
+              <li>Internet Bill: <span class="status unpaid">Not Paid</span></li>
+              <li>House Rent: <span class="status unpaid">Not Paid</span></li>
+              <li>Income Tax: <span class="status paid">Bill Paid</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

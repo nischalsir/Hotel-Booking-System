@@ -1,10 +1,9 @@
 <?php
 // Include the database connection
-$servername = "localhost";  // Your database server address
-$username = "root";         // Your database username
-$password = "";             // Your database password
-$dbname = "hotel_booking";  // Your database name
-
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "hotel_booking";
 // Create connection
 $conn = mysqli_connect($servername, $username, $password, $dbname);
 
@@ -21,16 +20,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_room'])) {
     $price = $_POST['price'];
     $availability = $_POST['availability'];
 
-    // Handle image upload
-    $image = $_FILES['image']['name'];
-    $image_tmp = $_FILES['image']['tmp_name'];
-    $image_path = "../public/uploads/" . basename($image);
+    // Define the target directory for images
+    $target_dir = "images/";
+    $image_name = basename($_FILES['image']['name']); // Use the original file name
+    $image_path = $target_dir . $image_name; // Path to save in the database
 
-    // Move the uploaded image to the desired directory
-    if (move_uploaded_file($image_tmp, $image_path)) {
+    // Ensure the images directory exists
+    if (!is_dir("../images")) {
+        mkdir("../images", 0755, true); // Create directory if it doesn't exist
+    }
+
+    // Check for duplicate file names and handle them
+    if (file_exists("../" . $image_path)) {
+        echo "Error: A file with the same name already exists. Please rename your file and try again.";
+        exit;
+    }
+
+    // Move the uploaded image to the target directory
+    if (move_uploaded_file($_FILES['image']['tmp_name'], "../" . $image_path)) {
         // Insert room data into the database
         $query = "INSERT INTO rooms (room_type, description, price, availability, image) 
-                  VALUES ('$room_type', '$description', '$price', '$availability', '$image')";
+                  VALUES ('$room_type', '$description', '$price', '$availability', '$image_path')";
 
         if (mysqli_query($conn, $query)) {
             echo "Room added successfully!";
@@ -72,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['modify_room'])) {
 
 // Delete room functionality
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_room'])) {
-    $room_type = $_POST['delete_room_type'];
+    $room_type = $_POST['delete_room'];
 
     // Delete the room from the database based on room type
     $query = "DELETE FROM rooms WHERE room_type = '$room_type'";

@@ -1,26 +1,28 @@
 <?php
 session_start();
-require "connection.php"; // Make sure this path is correct
+require "connection.php"; // Ensure the correct path to your connection file
 
 $errors = array();
 
 // Check if login form is submitted
 if (isset($_POST['login'])) {
-    $admin_name = mysqli_real_escape_string($con, $_POST['admin_name']);
-    $admin_pass = mysqli_real_escape_string($con, $_POST['admin_pass']);
+    $username = mysqli_real_escape_string($con, $_POST['username']);
+    $password = mysqli_real_escape_string($con, $_POST['password']);
 
     // Query to check if the admin exists
-    $check_admin = "SELECT * FROM admin_cred WHERE admin_name = '$admin_name'";
+    $check_admin = "SELECT * FROM admin_cred WHERE username = '$username'";
     $res = mysqli_query($con, $check_admin);
 
     if (mysqli_num_rows($res) > 0) {
         $fetch = mysqli_fetch_assoc($res);
-        $fetch_pass = $fetch['admin_pass'];
+        $stored_password = $fetch['password']; // Hashed password from the database
 
-        // Compare the entered password with the fetched password
-        if ($admin_pass === $fetch_pass) {
+        // Verify the entered password against the hashed password
+        if (password_verify($password, $stored_password)) {
             // Successful login
-            $_SESSION['admin_name'] = $admin_name;
+            $_SESSION['admin_id'] = $fetch['sr_no']; // Store admin ID in session
+            $_SESSION['admin_name'] = $fetch['first_name']; // Store admin's first name in session
+            $_SESSION['admin_image'] = $fetch['image']; // Store admin's image in session
             header('Location: admin-dashboard.php'); // Redirect to admin dashboard
             exit();
         } else {

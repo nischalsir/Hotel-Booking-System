@@ -273,6 +273,28 @@ nav {
   background-color: #f0f0f0;
 }
 
+.review-carousel {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.review-wrapper {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+}
+
+.review-carousel {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.review-wrapper {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+}
+
 .client-card {
   position: relative;
   padding: 2rem;
@@ -280,31 +302,75 @@ nav {
   border-radius: 1rem;
   box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.1);
   min-width: 300px; /* Ensure cards have a minimum width */
-  display: inline-block; /* Ensure cards stay in a row */
-  overflow: hidden; /* Hide overflowing content */
+  margin-right: 1rem; /* Space between cards */
+  text-align: center;
 }
 
-.client-card .content {
-  max-height: 80px; /* Set max height for content */
-  overflow: hidden; /* Hide overflowing text */
+.client-info {
+  text-align: center;
+  margin-bottom: 1rem;
 }
 
-.client-card .content.show-more {
-  max-height: unset; /* Show full content when expanded */
+.client-profile-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%; /* Round the profile picture */
+  object-fit: cover; /* Ensure the image maintains its aspect ratio and covers the circle */
+  margin-bottom: 0.5rem;
 }
-
 
 .client-card img {
   max-width: 80px;
-  margin: auto;
-  margin-bottom: 1rem;
+  margin: 0 auto 1rem;
   border-radius: 100%;
 }
 
-.client-card p {
-  text-align: center;
+.client-card h4.client-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
   color: var(--text-dark);
 }
+
+.client-card p.client-comment {
+  font-size: 1rem;
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+}
+
+.client-card .rating {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.client-card .rating i {
+  font-size: 1.2rem;
+  color: #ffe200;
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  transform: translateY(-50%);
+}
+
+.carousel-nav button {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.carousel-nav button:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
 
 .reward {
   padding: 2rem;

@@ -49,7 +49,9 @@ if ($is_logged_in) {
             <!-- User Info Section -->
             <?php if ($is_logged_in): ?>
                 <li class="nav-link">
-                    <img src="<?php echo htmlspecialchars($profile_pic_path); ?>" alt="Profile Picture" class="profile-pic" />
+                    <a href="profile.php">
+                        <img src="<?php echo htmlspecialchars($profile_pic_path); ?>" alt="Profile Picture" class="profile-pic" />
+                    </a>
                 </li>
                 <li class="nav-link">
                     <a href="logout.php"><button class="btn">Logout</button></a>
