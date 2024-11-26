@@ -15,15 +15,25 @@ if (isset($_POST['login'])) {
 
     if (mysqli_num_rows($res) > 0) {
         $fetch = mysqli_fetch_assoc($res);
-        $stored_password = $fetch['password']; // Hashed password from the database
+        $stored_password = $fetch['password']; // Hashed password
+        $is_temp_password = $fetch['is_temp_password'];
+        $temp_password = $fetch['temp_password'];
 
-        // Verify the entered password against the hashed password
-        if (password_verify($password, $stored_password)) {
+        // Check if the password is temporary
+        if ($is_temp_password == 1 && password_verify($password, $temp_password)) {
+            // Temporary password login
+            $_SESSION['admin_id'] = $fetch['sr_no'];
+            $_SESSION['admin_name'] = $fetch['first_name'];
+            $_SESSION['admin_image'] = $fetch['image'];
+            $_SESSION['requires_password_change'] = true; // Flag for password change
+            header('Location: change-password.php'); // Redirect to change password page
+            exit();
+        } elseif (password_verify($password, $stored_password)) {
             // Successful login
-            $_SESSION['admin_id'] = $fetch['sr_no']; // Store admin ID in session
-            $_SESSION['admin_name'] = $fetch['first_name']; // Store admin's first name in session
-            $_SESSION['admin_image'] = $fetch['image']; // Store admin's image in session
-            header('Location: admin-dashboard.php'); // Redirect to admin dashboard
+            $_SESSION['admin_id'] = $fetch['sr_no'];
+            $_SESSION['admin_name'] = $fetch['first_name'];
+            $_SESSION['admin_image'] = $fetch['image'];
+            header('Location: admin-dashboard.php'); // Redirect to dashboard
             exit();
         } else {
             $errors['login'] = "Incorrect password!";
