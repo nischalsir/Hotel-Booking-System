@@ -10,6 +10,7 @@ require '../config/rooms.php';
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Rooms</title>
+    <link rel="icon" type="image/png" href="../admin/img/hotel.png">
     <style>
         .form-container {
             max-width: 500px;
@@ -21,7 +22,7 @@ require '../config/rooms.php';
     <!-- start: Sidebar -->
     <div class="fixed left-0 top-0 w-64 h-full bg-gray-900 p-4 z-50 sidebar-menu transition-transform">
         <a href="#" class="flex items-center pb-4 border-b border-b-gray-800">
-            <img src="../public/images/nischal.jpg" alt="" class="w-8 h-8 rounded object-cover">
+            <img src="../admin/img/hotel.png" alt="" class="w-8 h-8 rounded object-cover">
             <span class="text-lg font-bold text-white ml-3">HBS</span>
         </a>
         <ul class="mt-4">

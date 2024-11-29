@@ -5,7 +5,7 @@ require "../config/connection.php";
 $from_email = "no-reply@hotelbookingsystem.com"; // Replace with a valid email address
 $from_name = "Hotel Booking System"; // Sender name
 
-// Fetch booking data with necessary joins
+// Fetch booking data for not checked-out bookings
 $query = "
     SELECT 
         b.id AS booking_id,
@@ -21,8 +21,14 @@ $query = "
     FROM bookings AS b
     JOIN usertable AS u ON b.user_email = u.email
     JOIN rooms AS r ON b.room_id = r.id
+    LEFT JOIN checkouts AS c ON b.id = c.booking_id
+    WHERE c.booking_id IS NULL -- Exclude bookings that are already checked out
     ORDER BY b.created_at DESC";
 $result = mysqli_query($con, $query);
+
+if (!$result) {
+    die("Error fetching bookings: " . mysqli_error($con));
+}
 
 // Handle approve and cancel actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

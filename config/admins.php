@@ -127,11 +127,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
     $con->close();
 }
-
-// Fetch all admins from the database
-$stmt = $con->prepare("SELECT first_name, last_name, email, phone, image_path FROM admin_cred");
-$stmt->execute();
-$result = $stmt->get_result();
-$admins = $result->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
 ?>

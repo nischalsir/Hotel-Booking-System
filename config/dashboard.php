@@ -57,12 +57,10 @@ $result = $stmt->get_result();
 $total_guests = $result->fetch_assoc()['total_guests'] ?? 0;
 $stmt->close();
 
-// Fetch total revenue
+// Fetch total revenue from the checkouts table
 $stmt = $con->prepare("
-    SELECT SUM(r.price * b.guests) AS total_revenue 
-    FROM bookings b 
-    JOIN rooms r ON b.room_id = r.id 
-    WHERE b.status = 'Confirmed'
+    SELECT SUM(amount_paid) AS total_revenue 
+    FROM checkouts
 ");
 $stmt->execute();
 $result = $stmt->get_result();
