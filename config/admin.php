@@ -2,6 +2,12 @@
 session_start();
 require "connection.php"; // Ensure the correct path to your connection file
 
+// Redirect logged-in admins to the dashboard
+if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
+    header("Location: admin-dashboard.php");
+    exit();
+}
+
 $errors = array();
 
 // Check if login form is submitted
@@ -22,6 +28,7 @@ if (isset($_POST['login'])) {
         // Check if the password is temporary
         if ($is_temp_password == 1 && password_verify($password, $temp_password)) {
             // Temporary password login
+            $_SESSION['admin_logged_in'] = true; // Set session flag
             $_SESSION['admin_id'] = $fetch['sr_no'];
             $_SESSION['admin_name'] = $fetch['first_name'];
             $_SESSION['admin_image'] = $fetch['image'];
@@ -30,6 +37,7 @@ if (isset($_POST['login'])) {
             exit();
         } elseif (password_verify($password, $stored_password)) {
             // Successful login
+            $_SESSION['admin_logged_in'] = true; // Set session flag
             $_SESSION['admin_id'] = $fetch['sr_no'];
             $_SESSION['admin_name'] = $fetch['first_name'];
             $_SESSION['admin_image'] = $fetch['image'];

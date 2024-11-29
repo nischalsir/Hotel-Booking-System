@@ -1,169 +1,232 @@
-<?php
-require '../config/connection.php'; // Update the path to your database connection file
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $first_name = trim($_POST['first_name']);
-    $last_name = trim($_POST['last_name']);
-    $email = trim($_POST['email']);
-    $address = trim($_POST['address']);
-    $phone = trim($_POST['phone']);
-
-    // Validate email repetition
-    $email_query = $con->prepare("SELECT COUNT(*) AS count FROM admin_cred WHERE email = ?");
-    $email_query->bind_param("s", $email);
-    $email_query->execute();
-    $email_result = $email_query->get_result()->fetch_assoc();
-    if ($email_result['count'] > 0) {
-        die("Error: The email address is already registered.");
-    }
-    $email_query->close();
-
-    // Validate phone number repetition
-    $phone_query = $con->prepare("SELECT COUNT(*) AS count FROM admin_cred WHERE phone = ?");
-    $phone_query->bind_param("s", $phone);
-    $phone_query->execute();
-    $phone_result = $phone_query->get_result()->fetch_assoc();
-    if ($phone_result['count'] > 0) {
-        die("Error: The phone number is already registered.");
-    }
-    $phone_query->close();
-
-    // Base username using "hbs." + first name
-    $base_username = 'hbs.' . strtolower(preg_replace('/\s+/', '', $first_name));
-
-    // Find the highest existing suffix for the base username
-    $username_query = $con->prepare("SELECT username FROM admin_cred WHERE username LIKE CONCAT(?, '%')");
-    $username_query->bind_param("s", $base_username);
-    $username_query->execute();
-    $result = $username_query->get_result();
-
-    $max_suffix = 0;
-    while ($row = $result->fetch_assoc()) {
-        if (preg_match('/(\d{4})$/', $row['username'], $matches)) {
-            $max_suffix = max($max_suffix, intval($matches[1]));
-        }
-    }
-    $username_query->close();
-
-    // Increment the max suffix to generate a new username
-    $new_suffix = str_pad($max_suffix + 1, 4, '0', STR_PAD_LEFT);
-    $username = $base_username . $new_suffix;
-
-    // Generate a random 8-character temporary password
-    $temp_password_plain = bin2hex(random_bytes(4)); // Example: "A1b2C3d4"
-    $hashed_temp_password = password_hash($temp_password_plain, PASSWORD_DEFAULT);
-
-    // Set absolute path for uploads directory
-    $target_dir = "C:/Users/nisch/OneDrive/Desktop/Project/HotelBookingSystem/admin/uploads/";
-    $original_file_name = basename($_FILES["image"]["name"]);
-    $file_extension = strtolower(pathinfo($original_file_name, PATHINFO_EXTENSION));
-
-    // Validate image
-    $check = getimagesize($_FILES["image"]["tmp_name"]);
-    if ($check === false) {
-        die("Error: File is not an image.");
-    }
-
-    // Check file size (limit to 2MB)
-    if ($_FILES["image"]["size"] > 2000000) {
-        die("Error: File size exceeds the 2MB limit.");
-    }
-
-    // Allow certain file formats
-    if (!in_array($file_extension, ['jpg', 'jpeg', 'png', 'gif'])) {
-        die("Error: Only JPG, JPEG, PNG, and GIF files are allowed.");
-    }
-
-    // Generate a unique file name using timestamp and username
-    $unique_file_name = $username . '_' . time() . '.' . $file_extension;
-    $target_file = $target_dir . $unique_file_name;
-
-    // Move uploaded file
-    if (!move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-        die("Error: There was an issue uploading your file.");
-    }
-
-    // Save relative path to the database
-    $relative_path = "uploads/" . $unique_file_name;
-
-    // Insert data into the database
-    $stmt = $con->prepare("INSERT INTO admin_cred (first_name, last_name, email, address, phone, username, temp_password, is_temp_password, image) 
-                           VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?)");
-    $stmt->bind_param("ssssssss", $first_name, $last_name, $email, $address, $phone, $username, $hashed_temp_password, $relative_path);
-
-    if ($stmt->execute()) {
-        echo "Admin added successfully.";
-
-        // Send email with temporary password
-        $to = $email;
-        $subject = "Account Created - Hotel Booking System";
-        $message = "
-            <html>
-            <head>
-            <title>Account Created</title>
-            </head>
-            <body>
-            <h2>Welcome to Hotel Booking System</h2>
-            <p>Dear $first_name $last_name,</p>
-            <p>Your account has been successfully created in the Hotel Booking System.</p>
-            <p>Login Details:</p>
-            <ul>
-                <li>Username: $username</li>
-                <li>Temporary Password: $temp_password_plain</li>
-            </ul>
-            <p>You are required to change your password upon your first login.</p>
-            <p>Thank you,<br>Admin Hotel Booking System</p>
-            </body>
-            </html>
-        ";
-        $headers = "MIME-Version: 1.0" . "\r\n";
-        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-        $headers .= "From: Admin HotelBookingSystem <admin@hotelbookingsystem.com>" . "\r\n";
-
-        if (mail($to, $subject, $message, $headers)) {
-            echo "Email sent to $email.";
-        } else {
-            echo "Error: Failed to send email.";
-        }
-    } else {
-        echo "Error: " . $stmt->error;
-    }
-
-    $stmt->close();
-    $con->close();
-}
-?>
-
+<?php require '../config/admins.php'; ?>
+<?php require '../config/dashboard.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Admins</title>
+    
+    <style>
+        .slider-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 1rem;
+            padding: 1rem 0;
+            scroll-snap-type: x mandatory;
+        }
+        .card {
+            flex: 0 0 auto;
+            width: 300px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            scroll-snap-align: start;
+        }
+        .card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        .card-content {
+            padding: 1rem;
+            text-align: center;
+        }
+        .card-content h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .card-content p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+        .delete-button {
+    background-color: #FF4D4D;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.delete-button:hover {
+    background-color: #FF1A1A;
+}
+
+    </style>
 </head>
-<body>
-    <h2>Add New Admin</h2>
-    <form action="admins.php" method="POST" enctype="multipart/form-data">
-        <label for="first_name">First Name:</label>
-        <input type="text" name="first_name" id="first_name" required><br>
 
-        <label for="last_name">Last Name:</label>
-        <input type="text" name="last_name" id="last_name" required><br>
+<body class="text-gray-800 font-inter">
+    
+    <!-- start: Sidebar -->
+    <div class="fixed left-0 top-0 w-64 h-full bg-gray-900 p-4 z-50 sidebar-menu transition-transform">
+        <a href="#" class="flex items-center pb-4 border-b border-b-gray-800">
+            <img src="../public/images/nischal.jpg" alt="" class="w-8 h-8 rounded object-cover">
+            <span class="text-lg font-bold text-white ml-3">HBS</span>
+        </a>
+        <ul class="mt-4">
+    <li class="mb-1 group">
+        <a href="admin-dashboard.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-home-2-line mr-3 text-lg"></i>
+            <span class="text-sm">Dashboard</span>
+        </a>
+    </li>
+    <li class="mb-1 group">
+        <a href="bookings.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-book-line mr-3 text-lg"></i>
+            <span class="text-sm">Bookings</span>
+        </a>
+    </li>
+    <li class="mb-1 group">
+        <a href="rooms.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-hotel-bed-line mr-3 text-lg"></i>
+            <span class="text-sm">Rooms</span>
+        </a>
+    </li>
+    <li class="mb-1 group">
+        <a href="reviews.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-star-line mr-3 text-lg"></i>
+            <span class="text-sm">Reviews</span>
+        </a>
+    </li>
+    <li class="mb-1 group">
+        <a href="messages.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-message-2-line mr-3 text-lg"></i>
+            <span class="text-sm">Messages</span>
+        </a>
+    </li>
+    <li class="mb-1 group">
+        <a href="admins.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-user-settings-line mr-3 text-lg"></i>
+            <span class="text-sm">Admins</span>
+        </a>
+    </li>
+    <li class="mb-1 group">
+        <a href="users.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-user-line mr-3 text-lg"></i>
+            <span class="text-sm">Users</span>
+        </a>
+    </li>
+    <li class="mb-1 group">
+        <a href="checkout.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-cash-line mr-3 text-lg"></i>
+            <span class="text-sm">Checkout</span>
+        </a>
+    </li>
+</ul>
+            </li>
+            <li class="mb-1 group">
+                <a href="logout-admin.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100">
+                    <i class="ri-logout-2-line mr-3 text-lg"></i>
+                    <span class="text-sm">Log Out</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="fixed top-0 left-0 w-full h-full bg-black/50 z-40 md:hidden sidebar-overlay"></div>
+    <!-- end: Sidebar -->
 
-        <label for="address">Address:</label>
-        <textarea name="address" id="address" required></textarea><br>
+    <!-- start: Main -->
+    <main class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-gray-50 min-h-screen transition-all main">
+        <div class="py-2 px-6 bg-white flex items-center shadow-md shadow-black/5 sticky top-0 left-0 z-30">
+            <button type="button" class="text-lg text-gray-600 sidebar-toggle">
+                <i class="ri-menu-line"></i>
+            </button>
+            <ul class="flex items-center text-sm ml-4">
+                <li class="mr-2">
+                    <a href="#" class="text-gray-400 hover:text-gray-600 font-medium">Admin</a>
+                </li>
+                <li class="text-gray-600 mr-2 font-medium">/</li>
+                <li class="text-gray-600 mr-2 font-medium">Admins</li>
+            </ul>
+            <ul class="ml-auto flex items-center">
+                
+                <li class="dropdown ml-3">
+    <button type="button" class="dropdown-toggle flex items-center">
+        <span class="ml-2 font-medium text-gray-600"><?= htmlspecialchars($admin_name) ?></span>
+        <img src="<?= htmlspecialchars($admin_image) ?>" alt="Admin Profile Picture" class="w-8 h-8 rounded-full object-cover">
+    </button>
+    <ul class="dropdown-menu shadow-md shadow-black/5 z-30 hidden py-1.5 rounded-md bg-white border border-gray-100 w-full max-w-[140px]">
+        <li>
+            <a href="#" class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-blue-500 hover:bg-gray-50">Profile</a>
+        </li>
+        <li>
+            <a href="logout-admin.php" class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-blue-500 hover:bg-gray-50">Logout</a>
+        </li>
+    </ul>
+</li>
+</ul>
+</div>
+<h2>Admin List</h2>
+        
+        <!-- Slider for admin cards -->
+        <div class="slider-container">
+    <?php foreach ($admins as $admin): ?>
+        <div class="card">
+            <img src="<?= htmlspecialchars($admin['image_path'] ?: 'uploads/default_profile_picture.png') ?>" alt="Profile Picture">
+            <div class="card-content">
+                <h3><?= htmlspecialchars($admin['first_name'] . ' ' . $admin['last_name']) ?></h3>
+                <p>Email: <?= htmlspecialchars($admin['email']) ?></p>
+                <p>Phone: <?= htmlspecialchars($admin['phone']) ?></p>
+                <form action="admins.php" method="POST" onsubmit="return confirm('Are you sure you want to delete this admin?');">
+                    <input type="hidden" name="delete_email" value="<?= htmlspecialchars($admin['email']) ?>">
+                    <button type="submit" class="delete-button">Delete</button>
+                </form>
+            </div>
+        </div>
+    <?php endforeach; ?>
+</div>
 
-        <label for="phone">Phone:</label>
-        <input type="text" name="phone" id="phone" required><br>
-
-        <label for="email">Email:</label>
-        <input type="email" name="email" id="email" required><br>
-
-        <label for="image">Profile Picture:</label>
-        <input type="file" name="image" id="image" accept="image/*" required><br>
-
-        <button type="submit" name="submit">Add Admin</button>
+        
+        <div class="max-w-2x2 mx-auto p-4">
+            <H1>Add new admin</H1>
+    <form action="admins.php" method="POST" enctype="multipart/form-data" class="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
+        <div class="grid gap-6 mb-4 md:grid-cols-2">
+            <div>
+                <label for="first_name" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-900">First Name</label>
+                <input type="text" id="first_name" name="first_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500" placeholder="John" required>
+            </div>
+            <div>
+                <label for="last_name" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-900">Last Name</label>
+                <input type="text" id="last_name" name="last_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500" placeholder="Doe" required>
+            </div>
+            <div>
+                <label for="address" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-900">Address</label>
+                <textarea id="address" name="address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500" placeholder="123 Main St" required></textarea>
+            </div>
+            <div>
+                <label for="phone" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-900">Phone Number</label>
+                <input type="text" id="phone" name="phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500" placeholder="123-456-7890" required>
+            </div>
+            <div>
+                <label for="email" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-900">Email Address</label>
+                <input type="email" id="email" name="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500" placeholder="john.doe@example.com" required>
+            </div>
+            <div>
+                <label for="image_path" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-900">Profile Picture</label>
+                <input type="file" id="image_path" name="image_path" accept="image/*" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500">
+            </div>
+        </div>
+        <button type="submit" class="text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-indigo-500 dark:hover:bg-indigo-600 dark:focus:ring-indigo-800">Add Admin</button>
     </form>
+</div>
+
+
+    
+    </main>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/script.js"></script>
+    <script>
+        // Optional: Add smooth scrolling behavior for the slider
+        document.querySelector('.slider-container').style.scrollBehavior = 'smooth';
+    </script>
 </body>
 </html>
-

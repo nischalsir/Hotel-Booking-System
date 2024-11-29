@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               Set a new secure password for your account.
             </p>
           </div>
-          <img src="img/password-reset.png" class="image" alt="Change Password" />
+          <img src="img/administrator.png" class="image" alt="Change Password" />
         </div>
       </div>
     </div>

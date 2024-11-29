@@ -1,122 +1,122 @@
 <?php
-// Include the database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "hotel_booking";
-// Create connection
-$conn = mysqli_connect($servername, $username, $password, $dbname);
-
-// Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-
-// Add room functionality
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_room'])) {
-    // Get form data
-    $room_type = $_POST['room_type'];
-    $description = $_POST['description'];
-    $price = $_POST['price'];
-    $availability = $_POST['availability'];
-
-    // Define the target directory for images
-    $target_dir = "images/";
-    $image_name = basename($_FILES['image']['name']); // Use the original file name
-    $image_path = $target_dir . $image_name; // Path to save in the database
-
-    // Ensure the images directory exists
-    if (!is_dir("../images")) {
-        mkdir("../images", 0755, true); // Create directory if it doesn't exist
-    }
-
-    // Check for duplicate file names and handle them
-    if (file_exists("../" . $image_path)) {
-        echo "Error: A file with the same name already exists. Please rename your file and try again.";
-        exit;
-    }
-
-    // Move the uploaded image to the target directory
-    if (move_uploaded_file($_FILES['image']['tmp_name'], "../" . $image_path)) {
-        // Insert room data into the database
-        $query = "INSERT INTO rooms (room_type, description, price, availability, image) 
-                  VALUES ('$room_type', '$description', '$price', '$availability', '$image_path')";
-
-        if (mysqli_query($conn, $query)) {
-            echo "Room added successfully!";
-        } else {
-            echo "Error: " . mysqli_error($conn);
-        }
-    } else {
-        echo "Error uploading image.";
-    }
-}
-
-// Modify room functionality
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['modify_room'])) {
-    $room_type = $_POST['room_type'];
-    $new_price = $_POST['new_price'];
-    $new_availability = $_POST['new_availability'];
-
-    // Check if the room type exists in the database
-    $check_query = "SELECT * FROM rooms WHERE room_type = '$room_type'";
-    $check_result = mysqli_query($conn, $check_query);
-
-    if (mysqli_num_rows($check_result) > 0) {
-        // Room type exists, proceed with the update
-        $update_query = "UPDATE rooms SET price = '$new_price', availability = '$new_availability' WHERE room_type = '$room_type'";
-
-        if (mysqli_query($conn, $update_query)) {
-            $notification = "Room details updated successfully!";
-            $notification_type = "success";  // For success
-        } else {
-            $notification = "Error updating room details: " . mysqli_error($conn);
-            $notification_type = "error";  // For error
-        }
-    } else {
-        // Room type doesn't exist
-        $notification = "Room type not found!";
-        $notification_type = "error";  // For error
-    }
-}
-
-// Delete room functionality
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_room'])) {
-    $room_type = $_POST['delete_room'];
-
-    // Delete the room from the database based on room type
-    $query = "DELETE FROM rooms WHERE room_type = '$room_type'";
-
-    if (mysqli_query($conn, $query)) {
-        echo "Room deleted successfully!";
-    } else {
-        echo "Error: " . mysqli_error($conn);
-    }
-}
-
-// Fetch all rooms for display
-$query = "SELECT * FROM rooms";
-$result = mysqli_query($conn, $query);
+require '../config/rooms.php';
 ?>
-<?php if (isset($notification)): ?>
-    <div class="notification <?php echo $notification_type; ?> p-4 mb-4">
-        <p><?php echo $notification; ?></p>
-    </div>
-<?php endif; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Rooms</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Rooms</title>
     <style>
         .form-container {
             max-width: 500px;
         }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="text-gray-800 font-inter">
+    
+    <!-- start: Sidebar -->
+    <div class="fixed left-0 top-0 w-64 h-full bg-gray-900 p-4 z-50 sidebar-menu transition-transform">
+        <a href="#" class="flex items-center pb-4 border-b border-b-gray-800">
+            <img src="../public/images/nischal.jpg" alt="" class="w-8 h-8 rounded object-cover">
+            <span class="text-lg font-bold text-white ml-3">HBS</span>
+        </a>
+        <ul class="mt-4">
+    <li class="mb-1 group">
+        <a href="admin-dashboard.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-home-2-line mr-3 text-lg"></i>
+            <span class="text-sm">Dashboard</span>
+        </a>
+    </li>
+    <li class="mb-1 group">
+        <a href="bookings.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-book-line mr-3 text-lg"></i>
+            <span class="text-sm">Bookings</span>
+        </a>
+    </li>
+    <li class="mb-1 group">
+        <a href="rooms.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-hotel-bed-line mr-3 text-lg"></i>
+            <span class="text-sm">Rooms</span>
+        </a>
+    </li>
+    <li class="mb-1 group">
+        <a href="reviews.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-star-line mr-3 text-lg"></i>
+            <span class="text-sm">Reviews</span>
+        </a>
+    </li>
+    <li class="mb-1 group">
+        <a href="messages.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-message-2-line mr-3 text-lg"></i>
+            <span class="text-sm">Messages</span>
+        </a>
+    </li>
+    <li class="mb-1 group">
+        <a href="admins.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-user-settings-line mr-3 text-lg"></i>
+            <span class="text-sm">Admins</span>
+        </a>
+    </li>
+    <li class="mb-1 group">
+        <a href="users.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-user-line mr-3 text-lg"></i>
+            <span class="text-sm">Users</span>
+        </a>
+    </li>
+    <li class="mb-1 group">
+        <a href="checkout.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md">
+            <i class="ri-cash-line mr-3 text-lg"></i>
+            <span class="text-sm">Checkout</span>
+        </a>
+    </li>
+</ul>
+            </li>
+            <li class="mb-1 group">
+                <a href="logout-admin.php" class="flex items-center py-2 px-4 text-gray-300 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100">
+                    <i class="ri-logout-2-line mr-3 text-lg"></i>
+                    <span class="text-sm">Log Out</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="fixed top-0 left-0 w-full h-full bg-black/50 z-40 md:hidden sidebar-overlay"></div>
+    <!-- end: Sidebar -->
+
+    <!-- start: Main -->
+    <main class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-gray-50 min-h-screen transition-all main">
+        <div class="py-2 px-6 bg-white flex items-center shadow-md shadow-black/5 sticky top-0 left-0 z-30">
+            <button type="button" class="text-lg text-gray-600 sidebar-toggle">
+                <i class="ri-menu-line"></i>
+            </button>
+            <ul class="flex items-center text-sm ml-4">
+                <li class="mr-2">
+                    <a href="#" class="text-gray-400 hover:text-gray-600 font-medium">Admin</a>
+                </li>
+                <li class="text-gray-600 mr-2 font-medium">/</li>
+                <li class="text-gray-600 mr-2 font-medium">Rooms</li>
+            </ul>
+            <ul class="ml-auto flex items-center">
+                
+                <li class="dropdown ml-3">
+    <button type="button" class="dropdown-toggle flex items-center">
+        <span class="ml-2 font-medium text-gray-600"><?= htmlspecialchars($admin_name) ?></span>
+        <img src="<?php echo htmlspecialchars($admin_image); ?>" alt="Admin Profile Picture" class="w-8 h-8 rounded object-cover block" />
+    </button>
+    <ul class="dropdown-menu shadow-md shadow-black/5 z-30 hidden py-1.5 rounded-md bg-white border border-gray-100 w-full max-w-[140px]">
+        <li>
+            <a href="#" class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-blue-500 hover:bg-gray-50">Profile</a>
+        </li>
+        <li>
+            <a href="logout-admin.php" class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-blue-500 hover:bg-gray-50">Logout</a>
+        </li>
+    </ul>
+</li>
+</ul>
+</div>
     <div class="container mx-auto my-12 p-6 bg-white shadow-lg rounded-lg form-container">
 
         <!-- Add Room Form -->
@@ -152,41 +152,43 @@ $result = mysqli_query($conn, $query);
 
             <button type="submit" name="add_room" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md">Add Room</button>
         </form>
-
-        <!-- Modify Room Form -->
         <h2 class="text-2xl font-bold mt-12 mb-6">Modify Room</h2>
-        <form method="POST">
-            <div class="mb-4">
-                <label for="room_type" class="block text-sm font-medium text-gray-700">Room Type</label>
-                <input type="text" id="room_type" name="room_type" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
-            </div>
+<form method="POST">
+    <div class="mb-4">
+        <label for="room_type" class="block text-sm font-medium text-gray-700">Room Type</label>
+        <select id="room_type" name="room_type" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+            <option value="">Select Room Type</option>
+            <?php
+            // Fetch room types from the database
+            $room_query = "SELECT DISTINCT room_type FROM rooms";
+            $room_result = mysqli_query($conn, $room_query);
 
-            <div class="mb-4">
-                <label for="new_price" class="block text-sm font-medium text-gray-700">New Price</label>
-                <input type="number" id="new_price" name="new_price" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
-            </div>
+            if ($room_result && mysqli_num_rows($room_result) > 0) {
+                while ($room_row = mysqli_fetch_assoc($room_result)) {
+                    echo '<option value="' . htmlspecialchars($room_row['room_type']) . '">' . htmlspecialchars($room_row['room_type']) . '</option>';
+                }
+            } else {
+                echo '<option value="">No rooms available</option>';
+            }
+            ?>
+        </select>
+    </div>
 
-            <div class="mb-4">
-                <label for="new_availability" class="block text-sm font-medium text-gray-700">New Availability</label>
-                <select id="new_availability" name="new_availability" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
-                    <option value="1">Available</option>
-                    <option value="0">Not Available</option>
-                </select>
-            </div>
+    <div class="mb-4">
+        <label for="new_price" class="block text-sm font-medium text-gray-700">New Price</label>
+        <input type="number" id="new_price" name="new_price" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+    </div>
 
-            <button type="submit" name="modify_room" class="w-full bg-yellow-600 text-white px-4 py-2 rounded-md">Modify Room</button>
-        </form>
+    <div class="mb-4">
+        <label for="new_availability" class="block text-sm font-medium text-gray-700">New Availability</label>
+        <select id="new_availability" name="new_availability" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+            <option value="1">Available</option>
+            <option value="0">Not Available</option>
+        </select>
+    </div>
 
-        <!-- Delete Room Form -->
-        <h2 class="text-2xl font-bold mt-12 mb-6">Delete Room</h2>
-        <form method="POST">
-            <div class="mb-4">
-                <label for="delete_room_type" class="block text-sm font-medium text-gray-700">Room Type to Delete</label>
-                <input type="text" id="delete_room_type" name="delete_room_type" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
-            </div>
-
-            <button type="submit" name="delete_room" class="w-full bg-red-600 text-white px-4 py-2 rounded-md">Delete Room</button>
-        </form>
+    <button type="submit" name="modify_room" class="w-full bg-yellow-600 text-white px-4 py-2 rounded-md">Modify Room</button>
+</form>
 
         <!-- Rooms Table -->
         <h2 class="text-2xl font-bold mt-12 mb-6">Rooms</h2>
@@ -218,8 +220,3 @@ $result = mysqli_query($conn, $query);
     </div>
 </body>
 </html>
-
-<?php
-// Close the database connection
-mysqli_close($conn);
-?>
