@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/form.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="../admin/img/hotel.png">
     <title>HBS - OTP Verification</title>
   </head>
 <body>

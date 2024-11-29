@@ -6,6 +6,7 @@
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="css/index.css">
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="icon" type="image/png" href="../admin/img/hotel.png">
   <title>HBS - About Us</title>
 </head>
 <body>

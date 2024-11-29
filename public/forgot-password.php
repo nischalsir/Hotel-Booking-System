@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="css/form.css">
   <meta charset="UTF-8">
   <title>HBS - Sign In</title>
-  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" href="../admin/img/hotel.png">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>

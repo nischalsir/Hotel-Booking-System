@@ -12,6 +12,7 @@ if($_SESSION['info'] == false){
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/form.css">
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="../admin/img/hotel.png">
     <title>Password changed</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
