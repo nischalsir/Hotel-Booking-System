@@ -186,7 +186,7 @@ $stmt->close();
                 <p>Phone: <?= htmlspecialchars($admin['phone']) ?></p>
                 <form action="admins.php" method="POST" onsubmit="return confirm('Are you sure you want to delete this admin?');">
                     <input type="hidden" name="delete_email" value="<?= htmlspecialchars($admin['email']) ?>">
-                    <button type="submit" class="delete-button">Delete</button>
+                    <button type="submit" class="delete-button" name="delete_admin">Delete</button>
                 </form>
             </div>
         </div>
